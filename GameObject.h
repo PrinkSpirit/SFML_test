@@ -15,15 +15,18 @@ protected:
 
 public:
 	GameObject();
-	GameObject(const sf::Texture *);
-	GameObject(glm::vec2, const sf::Texture *);
-	GameObject(glm::vec2, glm::vec2, sf::Texture);
+	GameObject(const sf::Texture &);
+	GameObject(glm::vec2, const sf::Texture &);
+	GameObject(glm::vec2, glm::vec2, const sf::Texture &);
 	virtual ~GameObject();
 
 	sf::Sprite* getSprite();
 	void setSprite(sf::Texture );
 	void setSprite(sf::Texture, glm::uvec2);
 
+	glm::vec2 getSize();
+
 	glm::vec2 getPosition();
+	void setPosition(glm::vec2);
 };
 

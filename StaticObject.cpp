@@ -6,7 +6,7 @@
 unsigned int StaticObject::counter = 0;
 
 
-StaticObject::StaticObject(glm::vec2 pos, const sf::Texture *texture, float isSolid) : 
+StaticObject::StaticObject(glm::vec2 pos, const sf::Texture &texture, float isSolid) : 
 	GameObject(pos, texture), isSolid(isSolid), id(counter++)
 {
 }
@@ -82,7 +82,7 @@ StaticObject* BlockFactory::createStaticObject(BlockType type, glm::vec2 pos)
 		case BlockType::Brick:
 			if (textureMap.find(type) == textureMap.end())
 				loadTextures(type);
-			block = std::shared_ptr<StaticObject>(new StaticObject(pos, textureMap[BlockType::Brick], true));
+			block = std::shared_ptr<StaticObject>(new StaticObject(pos, *textureMap[BlockType::Brick], true));
 			break;
 		
 		default:
