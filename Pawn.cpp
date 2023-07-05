@@ -16,6 +16,11 @@ Pawn::~Pawn()
 {
 }
 
+float Pawn::getAnimTimer() const
+{
+	return this->animTimer;
+}
+
 
 void Pawn::move(glm::vec2 dir)
 {
@@ -25,6 +30,9 @@ void Pawn::move(glm::vec2 dir)
 	else if (dir.x < 0) {
 		this->velocity.x -= this->m_speed.x;
 	}
+	else {
+		velocity.x = 0;
+	}
 
 	if (dir.y > 0) {
 		this->velocity.y += this->m_speed.y;
@@ -32,4 +40,23 @@ void Pawn::move(glm::vec2 dir)
 	else if (dir.y < 0) {
 		this->velocity.y -= this->m_speed.y;
 	}	
+}
+
+void Pawn::update(float dT)
+{
+	if (velocity.x > speedCap.x) {
+		velocity.x = speedCap.x;
+	}
+	else if (velocity.x < -speedCap.x) {
+		velocity.x = -speedCap.x;
+	}
+
+	if (velocity.y > speedCap.y) {
+		velocity.y = speedCap.y;
+	}
+	else if (velocity.y < -speedCap.y) {
+		velocity.y = -speedCap.y;
+	}
+
+	Actor::update(dT);
 }

@@ -11,6 +11,7 @@ Display::Display() {
 	this->window->setActive(false);
 
 	this->window->setFramerateLimit(this->frameRate);
+	//this->window->setKeyRepeatEnabled(false);
 
 	this->renderingThread = new sf::Thread(&threadedRendering, this);
 
@@ -49,6 +50,12 @@ void Display::rendering() {
 			this->window->draw((*object->getSprite()));
 		}
 		sprite = nullptr;
+		if (showDebug){
+			for(auto txt : this->UITxtList)
+			{
+				this->window->draw(*txt);
+			}
+		}
 	}
 	catch (const std::exception& e)
 	{
@@ -67,6 +74,16 @@ void Display::addSprite(GameObject* sprite) {
 void Display::removeSprite(GameObject* sprite) {
 	sf::Lock lock(this->mutex); // Ensure that the sprite list is not modified during the removal
 	this->renderList.erase(std::remove(this->renderList.begin(), this->renderList.end(), sprite), this->renderList.end());
+}
+
+void Display::addUITxt(sf::Text* txt)
+{
+	this->UITxtList.push_back(txt);
+}
+
+void Display::removeUITxt(sf::Text*)
+{
+	// TODO
 }
 
 Display* Display::Instance()
@@ -120,10 +137,15 @@ void Display::setBackgroundColor(sf::Color color)
 sf::Vector2f Display::toScreenSpace(glm::vec2 pos, glm::vec2 size)
 {
 	sf::Vector2f out;
-	out.x = pos.x * spriteScale.x;
-	out.y = window->getSize().y - (pos.y + size.y) * spriteScale.y;
+	out.x = (int)((pos.x + size.x / 2.0f) * spriteScale.x);
+	out.y = (int)(window->getSize().y - (pos.y + size.y/2.0f) * spriteScale.y);
 
 	return out;
+}
+
+void Display::toggleDebug()
+{
+	this->showDebug = !this->showDebug;
 }
 
 

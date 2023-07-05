@@ -6,30 +6,44 @@ Actor::Actor() : GameObject()
 
 Actor::Actor(glm::vec2 pos, const sf::Texture& texture) : GameObject(pos, texture)
 {
+	//this->sprite->setOrigin(texture.getSize().x / 16, texture.getSize().y / 16);
 }
 
 Actor::Actor(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture) : GameObject(pos, size, texture)
 {
+	//this->sprite->setOrigin(texture.getSize().x / 16, texture.getSize().y / 16);
 }
 
 Actor::~Actor()
 {
 }
 
-void Actor::update()
+glm::vec2 Actor::getVelocity() const
 {
-	if(usesGravity)
-	{
-		velocity.y -= gravity;
-	}
-
-	pos.x += velocity.x / 6;
-	pos.y += velocity.y / 6;
-
-	if (pos.y < 0)
-	{
-		pos.y = 0;
-		velocity.y = 0;
-	}
-	velocity *= 0.9f;
+	return velocity;
 }
+
+void Actor::setVelocity(glm::vec2 velocity)
+{
+	this->velocity = velocity;
+}
+
+void Actor::addToVelocity(glm::vec2 velocity)
+{
+	this->velocity += velocity;
+}
+
+bool Actor::getGravity() const
+{
+	return gravity;
+}
+
+void Actor::update(float dT)
+{
+	velocity.y -= gravity * dT;
+
+	position += velocity;
+
+	velocity.x *= 0.0f;
+}
+

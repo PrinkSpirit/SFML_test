@@ -7,7 +7,7 @@ class GameObject
 {
 protected:
 	// Logic
-	glm::vec2 pos; // Position in pixel of the element.
+	glm::vec2 position; // Position in pixel of the element.
 	glm::uvec2 size; // Size in pixel
 
 	// Graphics

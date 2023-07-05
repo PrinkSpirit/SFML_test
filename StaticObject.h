@@ -27,23 +27,3 @@ public:
 	StaticObject(glm::vec2 pos, const sf::Texture &texture, float isSolid);
 	virtual ~StaticObject();
 };
-
-class BlockFactory
-{
-protected:
-	BlockFactory();
-	static BlockFactory* instance;
-	Display* display = nullptr;
-
-	std::vector<std::shared_ptr<StaticObject>> objectList;
-	std::map<BlockType, sf::Texture*> textureMap;
-
-	void loadTextures(BlockType type);
-
-public:
-	~BlockFactory();
-	static BlockFactory* Instance();
-	static void release();
-
-	StaticObject* createStaticObject(BlockType type, glm::vec2 pos);
-};

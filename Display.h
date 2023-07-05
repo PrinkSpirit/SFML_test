@@ -23,8 +23,11 @@ protected:
 	float nesWidth = 256.0f;
 	float nesHeight = 240.0f;
 	float spriteUnit = 16.0f;
+
+	bool showDebug = false;
 	
 	std::vector<GameObject*> renderList;
+	std::vector<sf::Text*> UITxtList;
 
 	sf::Vector2f spriteScale = sf::Vector2f(2.0f, 2.0f);
 	sf::Color backgroundColor = sf::Color::Black;
@@ -38,6 +41,9 @@ public:
 
 	void addSprite(GameObject*);
 	void removeSprite(GameObject*);
+
+	void addUITxt(sf::Text*);
+	void removeUITxt(sf::Text*);
 	 
 	bool start();
 	bool stop();
@@ -56,6 +62,8 @@ public:
 	* \brief Convert a position in the world space to a position in the screen space.
 	*/
 	sf::Vector2f toScreenSpace(glm::vec2, glm::vec2);
+
+	void toggleDebug();
 };
 
 void threadedRendering(Display* display);

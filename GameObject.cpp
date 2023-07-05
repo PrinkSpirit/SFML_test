@@ -4,31 +4,35 @@
 
 GameObject::GameObject()
 {
-	this->pos = glm::vec2(0, 0);
+	this->position = glm::vec2(0, 0);
 	this->size = glm::uvec2(0, 0);
-
 	this->sprite = new sf::Sprite();
+	this->sprite->setOrigin(size.x / 2, size.y / 2);
 }
 
 GameObject::GameObject(const sf::Texture &texture)
 {
-	this->pos = glm::vec2(0, 0);
+	this->position = glm::vec2(0, 0);
 	this->sprite = new sf::Sprite();
 
 	this->sprite->setTexture(texture);
 	this->size = glm::uvec2(texture.getSize().x, texture.getSize().y);
+	this->sprite->setOrigin(size.x / 2, size.y / 2);
 }
 
-GameObject::GameObject(glm::vec2 pos, const sf::Texture &texture) :  pos(pos)
+GameObject::GameObject(glm::vec2 pos, const sf::Texture &texture) :  position(pos)
 {
 	this->sprite = new sf::Sprite();
 	this->sprite->setTexture(texture);
 	this->size = glm::uvec2(texture.getSize().x, texture.getSize().y);
+	this->sprite->setOrigin(size.x / 2, size.y / 2);
+	
 }
 
-GameObject::GameObject(glm::vec2 pos, glm::vec2 size, const sf::Texture &texture) : pos{ pos }, size{ size }
+GameObject::GameObject(glm::vec2 pos, glm::vec2 size, const sf::Texture &texture) : position{ pos }, size{ size }
 {
 	this->sprite->setTexture(texture);
+	this->sprite->setOrigin(size.x / 2, size.y / 2);
 }
 
 GameObject::~GameObject()
@@ -63,10 +67,10 @@ glm::vec2 GameObject::getSize()
 
 glm::vec2 GameObject::getPosition()
 {
-	return this->pos;
+	return this->position;
 }
 
 void GameObject::setPosition(glm::vec2 pos)
 {
-	this->pos = pos;
+	this->position = pos;
 }

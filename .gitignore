@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /ZeldaII.vcxproj.filters
 /ZeldaII.vcxproj
 /.gitignore
+*.ttf
