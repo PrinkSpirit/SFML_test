@@ -13,12 +13,12 @@ Level::~Level()
 
 void Level::addStaticObject(StaticObject* object)
 {
-	ObjectList.push_back(object);
+	m_StaticObjectList.push_back(object);
 }
 
 void Level::addActor(Actor* actor)
 {
-	ActorList.push_back(actor);
+	m_ActorList.push_back(actor);
 }
 
 void Level::setPlayer(Player* player)
@@ -35,21 +35,21 @@ void Level::testLevel()
 {
 	for (int i = 0; i < 22; i++) {
 
-		ObjectList.push_back(BlockFactory::Instance()->createStaticObject(BlockType::Brick, glm::vec2(i * 16, 0)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 0)));
 	}
 
-	ObjectList.push_back(BlockFactory::Instance()->createStaticObject(BlockType::Brick, glm::vec2(0, 4 * 16)));
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(0, 4 * 16)));
 
 	display->setBackgroundColor(sf::Color(92, 148, 252, 255));
 
 
-	this->player = (Player*)ActorFactory::Instance()->createPlayer(ActorType::Link, glm::vec2(4 * 16, 4 * 16));
-	ActorList.push_back(player);
+	this->player = (Player*)ActorFactory::Instance()->createPlayer(ObjectType::Link, glm::vec2(4 * 16, 4 * 16));
+	m_ActorList.push_back(player);
 }
 
 void Level::update(float dT)
 {
-	for (auto actor : ActorList) {
+	for (auto actor : m_ActorList) {
 		actor->update(dT);
 
 
