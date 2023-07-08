@@ -31,6 +31,7 @@ Player* Level::getPlayer()
 	return this->player;
 }
 
+
 void Level::testLevel()
 {
 	for (int i = 0; i < 22; i++) {
@@ -47,35 +48,42 @@ void Level::testLevel()
 	m_ActorList.push_back(player);
 }
 
+
 void Level::update(float dT)
 {
 	for (auto actor : m_ActorList) {
+		// Call all actors' update function
 		actor->update(dT);
 
+		boundingBoxCollision(actor, dT);
+	}
+}
 
-		if(actor->getPosition().x <= this->origin.x)
-		{
-			actor->setPosition(glm::vec2(this->origin.x, actor->getPosition().y));
-			actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
-		}
+void Level::boundingBoxCollision(Actor* actor, float dT)
+{
+	// Should velocity be just attenuated instead ?
+	if (actor->getPosition().x <= this->origin.x)
+	{
+		actor->setPosition(glm::vec2(this->origin.x, actor->getPosition().y));
+		actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
+	}
 
-		if (actor->getPosition().x > this->origin.x + this->size.x - actor->getSize().x)
-		{
-			actor->setPosition(glm::vec2(this->origin.x + this->size.x - actor->getSize().x, actor->getPosition().y));
-			actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
-		}
+	if (actor->getPosition().x > this->origin.x + this->size.x - actor->getSize().x)
+	{
+		actor->setPosition(glm::vec2(this->origin.x + this->size.x - actor->getSize().x, actor->getPosition().y));
+		actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
+	}
 
-		if (actor->getPosition().y <= 0)
-		{
-			actor->setPosition(glm::vec2(actor->getPosition().x, 0));
-			actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
-		}
+	if (actor->getPosition().y <= 0)
+	{
+		actor->setPosition(glm::vec2(actor->getPosition().x, 0));
+		actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
+	}
 
-		if(actor->getPosition().y > this->origin.y + this->size.y - actor->getSize().y)
-		{
-			actor->setPosition(glm::vec2(actor->getPosition().x, this->origin.y + this->size.y - actor->getSize().y));
-			actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
-		}
+	if (actor->getPosition().y > this->origin.y + this->size.y - actor->getSize().y)
+	{
+		actor->setPosition(glm::vec2(actor->getPosition().x, this->origin.y + this->size.y - actor->getSize().y));
+		actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
 	}
 }
 

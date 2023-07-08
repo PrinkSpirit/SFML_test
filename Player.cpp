@@ -6,16 +6,19 @@ Player::Player() : Pawn()
 
 Player::Player(glm::vec2 pos, const sf::Texture& texture) : Pawn(pos, texture)
 {
-	m_speed = glm::vec2(100.0f,200.0f);
-    this->sprite->setTextureRect(sf::IntRect(0, 0, 32, 32));
+	m_speed = glm::vec2(100.0f,200.0f); // Speed, magic number.
+
+    // Reference to the iddle position on the sprite sheet
+    this->sprite->setTextureRect(sf::IntRect(0, 0, 32, 32)); 
     this->size = { sprite->getTextureRect().width / 1.5, sprite->getTextureRect().height};
     this->sprite->setOrigin(size.x/2.0f, size.y/2.0f);
-    m_animations.push_back(sf::IntRect(0, 0, 32, 32));
-    m_animations.push_back(sf::IntRect(64, 0, 32, 32));
-    m_animations.push_back(sf::IntRect(96, 0, 32, 32));
-    m_animations.push_back(sf::IntRect(32, 0, 32, 32));
-    m_animations.push_back(sf::IntRect(64, 0, 32, 32));
-    m_animations.push_back(sf::IntRect(96, 0, 32, 32));
+
+    m_animations.push_back(sf::IntRect(0, 0, 32, 32));  // Iddle / Walk 1
+    m_animations.push_back(sf::IntRect(64, 0, 32, 32)); // Walk 2
+    m_animations.push_back(sf::IntRect(96, 0, 32, 32)); // Walk 3
+    m_animations.push_back(sf::IntRect(32, 0, 32, 32)); // Walk 4
+    m_animations.push_back(sf::IntRect(64, 0, 32, 32)); // Walk 5
+    m_animations.push_back(sf::IntRect(96, 0, 32, 32)); // Walk 6 / jumping
 }
 
 Player::Player(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture) : Pawn(pos, size, texture)
@@ -34,6 +37,7 @@ bool Player::isJumping() const
 void Player::jump()
 {
     if (!m_jumping) {
+        this->state = State::jumping;
 		m_jumping = true;
 		velocity.y = m_speed.y / 7500.0f;
 	}
@@ -80,7 +84,6 @@ void Player::update(float dT)
         }
 
         if (m_controller->jump()) {
-            this->state = State::jumping;
             jump();
         }
 
@@ -100,7 +103,10 @@ void Player::update(float dT)
         this->sprite->setScale(-s.x, s.y);
     }
 
+    // Call the parent update function
 	Pawn::update(dT);
+
+    // Check if the player is on the ground after the position update
     if (this->velocity.y >= -0.01f && this->velocity.y <= 0.01f && m_controller != nullptr) {
         if (!m_controller->jump()) {
 			m_jumping = false;

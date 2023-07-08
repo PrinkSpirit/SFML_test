@@ -57,9 +57,8 @@ Player* ActorFactory::createPlayer(ObjectType type, glm::vec2 pos)
 {
 	Player* player = nullptr;
 	switch (type) {
-	case ObjectType::Link:
-		if (m_textureMap.find(type) == m_textureMap.end())
-			loadTexture(type);
+	case ObjectType::Link:	
+		loadTexture(type);
 		player = new Player(pos, *m_textureMap[ObjectType::Link]);
 		break;
 

@@ -4,7 +4,8 @@
 #include <cmath>
 
 
-Display* Display::instance = nullptr;
+// Singleton instance pointer is set to nullptr at the beginning
+Display* Display::instance = nullptr; 
 
 Display::Display() {
 	this->window = new sf::RenderWindow(sf::VideoMode(nesWidth*4, nesHeight*4), "Zelda II - Clone");
@@ -21,6 +22,7 @@ Display::Display() {
 
 Display::~Display()
 {
+	// Wait for the rendering thread to stop
 	this->renderingThread->wait();
 	delete(this->renderingThread);
 	delete(this->window);
@@ -78,12 +80,14 @@ void Display::removeSprite(GameObject* sprite) {
 
 void Display::addUITxt(sf::Text* txt)
 {
+	sf::Lock lock(this->mutex);
 	this->UITxtList.push_back(txt);
 }
 
-void Display::removeUITxt(sf::Text*)
+void Display::removeUITxt(sf::Text* txt)
 {
-	// TODO
+	sf::Lock lock(this->mutex);
+	this->UITxtList.erase(std::remove(this->UITxtList.begin(), this->UITxtList.end(), txt), this->UITxtList.end());
 }
 
 Display* Display::Instance()
@@ -96,17 +100,19 @@ Display* Display::Instance()
 	return instance;
 }
 
-bool Display::start() {
-	this->isRunning = true;
-	this->renderingThread->launch();
-	return true;
+void Display::start() {
+	if (!this->isRunning) {
+		this->isRunning = true;
+		this->renderingThread->launch();
+	}
 }
 
-bool Display::stop() {
-	this->isRunning = false;
-	this->renderingThread->wait();
-	this->window->close();
-	return true;
+void Display::stop() {
+	if (this->isRunning) {
+		this->isRunning = false;
+		this->renderingThread->wait();
+		this->window->close();
+	}
 }
 
 void releaseDisplay()
@@ -115,8 +121,10 @@ void releaseDisplay()
 }
 
 void Display::release() {
-	delete(instance);
-	instance = nullptr;
+	if (instance != nullptr) { // Insure that the instance exists
+		delete(instance);
+		instance = nullptr;
+	}
 }
 
 bool Display::isWindowOpen()

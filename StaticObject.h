@@ -11,16 +11,15 @@
 #include "GameObject.h"
 
 
-enum class BlockType {
-	Brick,
-};
-
+/// <summary>
+/// Represent element that don't move like a wall or blocks.
+/// </summary>
 class StaticObject : public GameObject
 {
 protected:
-	static unsigned int counter;
-	int id;
-	bool isSolid = true;
+	static unsigned int counter; // Counter of the number of StaticObject created. Unused.
+	int id;						 // Id of the StaticObject. Unused.
+	bool isSolid = true;		 // Whether the game should check for collision or not.
 
 public:
 	StaticObject() = delete;

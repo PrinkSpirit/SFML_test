@@ -42,8 +42,7 @@ GameObject* BlockFactory::createObject(ObjectType type, glm::vec2 pos)
 	GameObject* block = nullptr;
 	switch (type) {
 	case ObjectType::Brick:
-		if (m_textureMap.find(type) == m_textureMap.end())
-			loadTexture(type);
+		loadTexture(type);
 		block = new StaticObject(pos, *m_textureMap[ObjectType::Brick], true);
 		break;
 

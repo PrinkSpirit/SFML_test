@@ -6,12 +6,12 @@ Actor::Actor() : GameObject()
 
 Actor::Actor(glm::vec2 pos, const sf::Texture& texture) : GameObject(pos, texture)
 {
-	//this->sprite->setOrigin(texture.getSize().x / 16, texture.getSize().y / 16);
+	//this->sprite->setOrigin(texture.getSize().x / 2.0, texture.getSize().y / 2.0);
 }
 
 Actor::Actor(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture) : GameObject(pos, size, texture)
 {
-	//this->sprite->setOrigin(texture.getSize().x / 16, texture.getSize().y / 16);
+	//this->sprite->setOrigin(texture.getSize().x / 2.0, texture.getSize().y / 2.0);
 }
 
 Actor::~Actor()
@@ -33,7 +33,7 @@ void Actor::addToVelocity(glm::vec2 velocity)
 	this->velocity += velocity;
 }
 
-bool Actor::getGravity() const
+float Actor::getGravity()
 {
 	return gravity;
 }

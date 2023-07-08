@@ -7,7 +7,8 @@ GameObject::GameObject()
 	this->position = glm::vec2(0, 0);
 	this->size = glm::uvec2(0, 0);
 	this->sprite = new sf::Sprite();
-	this->sprite->setOrigin(size.x / 2, size.y / 2);
+	// Set the origin at the center of the object to facilitate sprite transformations
+	this->sprite->setOrigin(size.x / 2, size.y / 2);  
 }
 
 GameObject::GameObject(const sf::Texture &texture)
@@ -25,6 +26,7 @@ GameObject::GameObject(glm::vec2 pos, const sf::Texture &texture) :  position(po
 	this->sprite = new sf::Sprite();
 	this->sprite->setTexture(texture);
 	this->size = glm::uvec2(texture.getSize().x, texture.getSize().y);
+	// Set the origin at the center of the object to facilitate sprite transformations
 	this->sprite->setOrigin(size.x / 2, size.y / 2);
 	
 }
@@ -32,6 +34,7 @@ GameObject::GameObject(glm::vec2 pos, const sf::Texture &texture) :  position(po
 GameObject::GameObject(glm::vec2 pos, glm::vec2 size, const sf::Texture &texture) : position{ pos }, size{ size }
 {
 	this->sprite->setTexture(texture);
+	// Set the origin at the center of the object to facilitate sprite transformations
 	this->sprite->setOrigin(size.x / 2, size.y / 2);
 }
 
