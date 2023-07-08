@@ -9,6 +9,8 @@
 #include "Display.h"
 
 
+const float epsilon = 0.00001f;
+
 /// <summary>
 /// This class represents a level in the game. It contains and manage all 
 /// the static objects and actors in the level.

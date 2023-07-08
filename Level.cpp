@@ -90,9 +90,8 @@ void Level::boundingBoxCollision(Actor* actor, float dT)
 	}
 }
 
-bool intersects(glm::vec2 A1, glm::vec2 A2, glm::vec2 B1, glm::vec2 B2)
-{
-	return (A1.x < B2.x && A2.x > B1.x && A1.y < B2.y && A2.y > B1.y);
+bool intersects(glm::vec2 A1, glm::vec2 A2, glm::vec2 B1, glm::vec2 B2) {
+	return (A1.x < B2.x + epsilon && A2.x > B1.x - epsilon && A1.y < B2.y + epsilon && A2.y > B1.y - epsilon);
 }
 
 void handleCollision(Actor* actor, GameObject* object, float dT)
@@ -103,60 +102,27 @@ void handleCollision(Actor* actor, GameObject* object, float dT)
 	glm::vec2 Bp = actor->getPosition();
 	glm::vec2 Bs = actor->getSize();
 
-	if (actor->getVelocity().y < 0) { // Falling
+	// Resolve without relying on velocity if possible
+
+	if (actor->getVelocity().y < -epsilon) { // Falling
 		actor->setPosition(glm::vec2(Ap.x, Bp.y));
 		actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
 	}
 
-	if (actor->getVelocity().y > 0.01) {
-		actor->setPosition(glm::vec2(Ap.x, Bp.y - As.y));
+	if (actor->getVelocity().y > epsilon) { // Rising
+		actor->setPosition(glm::vec2(Ap.x, Bp.y - Bs.y));
 		actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
 	}
 
 	if (intersects(actor->getPosition(), actor->getPosition() + actor->getSize(), object->getPosition(), object->getPosition() + object->getSize())) {
-		if (actor->getVelocity().x > 0) {
-			actor->setPosition(glm::vec2(Bp.x - Bs.x / 2.0f, Ap.y));
+		if (actor->getVelocity().x < 0) { // Moving left
+			actor->setPosition(glm::vec2(Bp.x + Bs.x, Ap.y));
 			actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
 		}
-		
-		if (actor->getVelocity().x < 0) {
-			actor->setPosition(glm::vec2(Bp.x + Bs.x / 2.0f, Ap.y));
+
+ 		if (actor->getVelocity().x > 0) { // Moving right
+			actor->setPosition(glm::vec2(Bp.x, Ap.y));
 			actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
 		}
 	}
-
-	//float Ah = A->element->sprite->w;
-	//float Aw = A->element->sprite->h;
-
-	//float Bx = B->pos_x;
-	//float By = B->pos_y;
-	//float Bh = B->sprite->w;
-	//float Bw = B->sprite->h;
-
-	//if (A->v_a > 0) { // Is falling
-	//	A->element->pos_y = By - Bh - Ah;
-	//	A->v_a = 0;
-	//}
-
-	//if (A->v_a < 0) { // Is rising
-	//	A->element->pos_y = By;
-	//	A->v_a = 0;
-	//}
-	//A->element->sprite->x = (int)A->element->pos_x;
-	//A->element->sprite->y = (int)A->element->pos_y;
-
-	//if (isColliding(A->element, B)) {
-	//	if (A->h_a > 0) { // Is going right
-	//		A->element->pos_x = Bx - Aw; // New position is B minus A's Sprite width
-	//		A->h_a = 0; // Momentum is cut
-	//	}
-
-	//	if (A->h_a < 0) { // Is going left
-	//		A->element->pos_x = Bx + Bw; // New position is B plus B's Sprite width
-	//		A->h_a = 0; // Momentum is cut
-	//	}
-
-	//	A->element->sprite->x = (int)A->element->pos_x;
-	//	A->element->sprite->y = (int)A->element->pos_y;
-	//}
 }
