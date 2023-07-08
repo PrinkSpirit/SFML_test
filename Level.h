@@ -68,6 +68,8 @@ public:
 	/// <param name="dT">Delta Time - Time elapsed since last function call</param>
 	void update(float dT);
 
+	
+
 	/// <summary>
 	/// Check collisions with the level's boundaries
 	/// </summary>
@@ -76,3 +78,14 @@ public:
 	void boundingBoxCollision(Actor* actor, float dT);
 };
 
+/// <summary>
+/// Check if two rectangles overlap.
+/// </summary>
+/// <param name="A1"></param>
+/// <param name="A2"></param>
+/// <param name="B1"></param>
+/// <param name="B2"></param>
+/// <returns>Boolean</returns>
+bool intersects(glm::vec2 A1, glm::vec2 A2, glm::vec2 B1, glm::vec2 B2);
+
+void handleCollision(Actor* actor, GameObject* object, float dT);
