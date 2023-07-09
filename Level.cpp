@@ -57,9 +57,10 @@ void Level::update(float dT)
 
 		// Check for collisions
 		for (auto object : m_StaticObjectList) {
-			if (intersects(actor->getPosition(), actor->getPosition() + actor->getSize(), object->getPosition(), object->getPosition() + object->getSize())) {
+			/*if (intersects(actor->getPosition(), actor->getPosition() + actor->getSize(), object->getPosition(), object->getPosition() + object->getSize())) {
 				handleCollision(actor, object, dT);
-			}
+			}*/
+			handleCollision(actor, object, dT);
 		}
 
 		boundingBoxCollision(actor, dT);
@@ -96,33 +97,38 @@ bool intersects(glm::vec2 A1, glm::vec2 A2, glm::vec2 B1, glm::vec2 B2) {
 
 void handleCollision(Actor* actor, GameObject* object, float dT)
 {
+	// if actor horizontal velocity > 0
+	//  - Handle collision with left side of object
+	//  - Hitbox with minus epsillon on the right 
+
+	
+
 	glm::vec2 Ap = actor->getPosition();
 	glm::vec2 As = actor->getSize();
+	glm::vec2 Av = actor->getVelocity();
 
-	glm::vec2 Bp = actor->getPosition();
-	glm::vec2 Bs = actor->getSize();
+	glm::vec2 Bp = object->getPosition();
+	glm::vec2 Bs = object->getSize();
 
-	// Resolve without relying on velocity if possible
+	
 
-	if (actor->getVelocity().y < -epsilon) { // Falling
-		actor->setPosition(glm::vec2(Ap.x, Bp.y));
+	if (actor->getVelocity().x < 0 && intersects(Ap, Ap + As, Bp, Bp + Bs)) { // Moving left
+		actor->setPosition(glm::vec2(Bp.x + Bs.x, Ap.y));
+		actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
+	}
+
+ 	if (actor->getVelocity().x > 0 && intersects(Ap, Ap + As, Bp, Bp + Bs)) { // Moving right
+		actor->setPosition(glm::vec2(Bp.x, Ap.y));
+		actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
+	}
+
+	if (Av.y < 0 && intersects(Ap, Ap + As, Bp + glm::vec2(0, 4.0f), Bp + Bs)) { // Falling
+		actor->setPosition(glm::vec2(Ap.x, Bp.y + Bs.y));
 		actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
 	}
 
-	if (actor->getVelocity().y > epsilon) { // Rising
-		actor->setPosition(glm::vec2(Ap.x, Bp.y - Bs.y));
+	if (Av.y > 0 && intersects(Ap, Ap + As, Bp, Bp + Bs)) { // Rising
+		actor->setPosition(glm::vec2(Ap.x, Bp.y - As.y));
 		actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
-	}
-
-	if (intersects(actor->getPosition(), actor->getPosition() + actor->getSize(), object->getPosition(), object->getPosition() + object->getSize())) {
-		if (actor->getVelocity().x < 0) { // Moving left
-			actor->setPosition(glm::vec2(Bp.x + Bs.x, Ap.y));
-			actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
-		}
-
- 		if (actor->getVelocity().x > 0) { // Moving right
-			actor->setPosition(glm::vec2(Bp.x, Ap.y));
-			actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
-		}
 	}
 }
