@@ -34,24 +34,84 @@ bool Player::isJumping() const
 	return m_jumping;
 }
 
-void Player::jump()
+void Player::jump(float dT)
 {
-    if (!m_jumping) {
-        this->state = State::jumping;
+    if (m_state!=PlayerState::jumping) {
+        this->m_state = PlayerState::jumping;
 		m_jumping = true;
 		velocity.y = m_speed.y / 7500.0f;
 	}
+    if (m_state != PlayerState::jumping) {
+        if (m_controller->left()) {  // Lateral air control
+            this->velocity.x -= this->m_speed.x * dT;
+        }
+		else if (m_controller->right()) {
+			this->velocity.x += this->m_speed.x * dT;
+		}
+    }
 }
 
-//void Player::move(int input)
-//{
-//
-//}
+void Player::idle(float dT)
+{
+    if (m_controller->left() || m_controller->right()) {
+        move(dT);
+	} else if (m_controller->jump()) {
+        jump(dT);
+	}
+    else {
+		this->m_state = PlayerState::idle;
+	}
+}
+
+void Player::move(float dT)
+{    
+    if (m_controller->left() && m_state == PlayerState::movingLeft) {  // If the player is still moving in the same direction
+        this->velocity.x -= this->m_speed.x * dT;
+        this->m_animTimer += dT;    // We increment the animation timer
+    } 
+    else if (m_controller->left()) { // else
+        this->velocity.x -= this->m_speed.x * dT;
+        this->m_animTimer = 0.0f;   // We reset the animation timer
+        m_state = PlayerState::movingLeft; // And set the state to moving left
+    }
+
+    if (m_controller->right() && m_state == PlayerState::movingRight) {
+        this->velocity.x += this->m_speed.x * dT;
+        this->m_animTimer += dT;
+    } 
+    else if (m_controller->right() ) {  
+        this->velocity.x += this->m_speed.x * dT;
+        this->m_animTimer = 0.0f;       
+        m_state = PlayerState::movingRight;
+    }
+
+    // Set the animation frame, may be moved in the future
+    if (this->m_state == PlayerState::movingLeft || this->m_state == PlayerState::movingRight) {
+        this->sprite->setTextureRect(m_animations[((int)(this->m_animTimer * 12) % 6)]);
+    }
+
+    if(m_controller->jump()) {
+		jump(dT);
+	}
+}
 
 void Player::update(float dT)
 {
 	if (m_controller != nullptr) {
-        
+        std::cout << (int)m_state << std::endl;
+        switch (m_state) {
+        case PlayerState::movingLeft:
+        case PlayerState::movingRight:
+            move(dT);
+            break;
+        case PlayerState::jumping:
+            jump(dT);
+            break;
+        case PlayerState::idle:
+            idle(dT);
+            break;
+        }
+
         //this->state = State::iddle;
         if (m_controller->up()) {
             //move(glm::vec2(0, 1));
@@ -61,41 +121,14 @@ void Player::update(float dT)
             //move(glm::vec2(0, -1));
             this->velocity.y -= this->m_speed.y * dT;
         }
-        if (m_controller->left()) {
-            //move(glm::vec2(-1, 0));
-            this->velocity.x -= this->m_speed.x * dT;
-            if (this->state == State::movingLeft) {
-                this->animTimer += dT;
-            } else {
-				this->animTimer = 0.0f;
-				this->state = State::movingLeft;
-			}
-        }
-        if (m_controller->right()) {
-            //move(glm::vec2(1, 0));
-            this->velocity.x += this->m_speed.x * dT;
-            if (this->state == State::movingRight) {
-                this->animTimer += dT;
-            }
-            else {
-                this->animTimer = 0.0f;
-                this->state = State::movingRight;
-            }
-        }
 
-        if (m_controller->jump()) {
-            jump();
-        }
-
-        if (this->state == State::movingLeft || this->state == State::movingRight) {
-            this->sprite->setTextureRect(m_animations[((int)(this->animTimer * 12) % 6)]);
-        }
-        else if (this->state == State::jumping) {
+        
+        /*if (this->m_state == PlayerState::jumping) {
 			this->sprite->setTextureRect(sf::IntRect(3 * 32, 0, 32, 32));
 		}
-		else {
+		else if(m_state == PlayerState::idle) {
 			this->sprite->setTextureRect(sf::IntRect(0, 0, 32, 32));
-		}
+		}*/
 	}
     sf::Vector2f s = sprite->getScale();
 
@@ -107,11 +140,12 @@ void Player::update(float dT)
 	Pawn::update(dT);
 
     // Check if the player is on the ground after the position update
-    if (this->velocity.y >= -0.01f && this->velocity.y <= 0.01f && m_controller != nullptr) {
+    /*if (this->velocity.y >= -0.01f && this->velocity.y <= 0.01f && m_controller != nullptr) {
         if (!m_controller->jump()) {
 			m_jumping = false;
+            this->m_state = PlayerState::idle;
 		}
-	}
+	}*/
 }
 
 void Player::setController(Controller* controller)

@@ -2,11 +2,26 @@
 #include "Pawn.h"
 #include "Controller.h"
 
+enum class PlayerState
+{
+	idle,
+	movingLeft,
+	movingRight,
+	jumping,
+	falling,
+	crouching,
+	attacking,
+	hurt,
+	dead
+};
+
 class Player : public Pawn
 {
 protected:
 	bool m_jumping = false; /// Whether the player is jumping.
-	bool grounded = false; /// Whether the player is on the ground.
+	bool m_grounded = false; /// Whether the player is on the ground.
+
+	PlayerState m_state = PlayerState::idle; /// The current state of the player.
 
 	Controller* m_controller = nullptr;			/// Pointer to the control manager
 	std::vector< sf::IntRect > m_animations;    /// Vector of the sprites for the animation
@@ -23,10 +38,16 @@ public:
 	/// <returns>boolean of the jumping state</returns>
 	bool isJumping() const;
 
+
+	void idle(float dT);
+	void move(float dT);
+	void attack(float dT);
+	void crouch(float dT);
+
 	/// <summary>
 	/// Handle the jumping action.
 	/// </summary>
-	void jump();
+	void jump(float dT);
 
 	//virtual void move(int input);
 

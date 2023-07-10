@@ -18,7 +18,7 @@ Pawn::~Pawn()
 
 float Pawn::getAnimTimer() const
 {
-	return this->animTimer;
+	return this->m_animTimer;
 }
 
 

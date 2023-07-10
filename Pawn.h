@@ -14,8 +14,8 @@ class Pawn : public Actor
 {
 protected:
 	glm::vec2 m_speed{1.0f,1.0f}; // Define acceleration on movement
-	State state = State::iddle;
-	float animTimer = 0.0f;
+	//State state = State::iddle;
+	
 
 public:
 	Pawn();

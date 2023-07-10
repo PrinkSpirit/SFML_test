@@ -15,6 +15,7 @@ protected:
 	float gravity = .06f;					// Gravity applied to the actor
 
 	bool needUpdate = false;				// Whether the actor need to be updated or not. Unused.
+	float m_animTimer = 0.0f;					// Timer used for animation
 
 public: 
 	Actor();
