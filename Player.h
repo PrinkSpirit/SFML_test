@@ -49,6 +49,8 @@ public:
 	/// </summary>
 	void jump(float dT);
 
+	void fall(float dT);
+
 	//virtual void move(int input);
 
 	/// <summary>

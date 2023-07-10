@@ -40,14 +40,32 @@ void Player::jump(float dT)
         this->m_state = PlayerState::jumping;
 		m_jumping = true;
 		velocity.y = m_speed.y / 7500.0f;
+        this->sprite->setTextureRect(sf::IntRect(3 * 32, 0, 32, 32));
 	}
-    if (m_state != PlayerState::jumping) {
+    if (m_state == PlayerState::jumping) {
         if (m_controller->left()) {  // Lateral air control
             this->velocity.x -= this->m_speed.x * dT;
         }
 		else if (m_controller->right()) {
 			this->velocity.x += this->m_speed.x * dT;
 		}
+    }
+    if (velocity.y < 0 - FLT_EPSILON) {
+        m_state = PlayerState::falling;
+    }
+}
+
+void Player::fall(float dT)
+{
+    this->sprite->setTextureRect(sf::IntRect(3 * 32, 0, 32, 32));
+    if (m_controller->left()) {  // Lateral air control
+        this->velocity.x -= this->m_speed.x * dT;
+    }
+    else if (m_controller->right()) {
+        this->velocity.x += this->m_speed.x * dT;
+    }
+    if (velocity.y > -FLT_EPSILON) {
+        m_state = PlayerState::idle;
     }
 }
 
@@ -58,9 +76,9 @@ void Player::idle(float dT)
 	} else if (m_controller->jump()) {
         jump(dT);
 	}
-    else {
-		this->m_state = PlayerState::idle;
-	}
+    if (velocity.y < -FLT_EPSILON) {
+        m_state = PlayerState::falling;
+    }
 }
 
 void Player::move(float dT)
@@ -93,12 +111,15 @@ void Player::move(float dT)
     if(m_controller->jump()) {
 		jump(dT);
 	}
+    if (velocity.y < -FLT_EPSILON) {
+        m_state = PlayerState::falling;
+    }
 }
 
 void Player::update(float dT)
 {
+    //std::cout << (int)m_state << std::endl;
 	if (m_controller != nullptr) {
-        std::cout << (int)m_state << std::endl;
         switch (m_state) {
         case PlayerState::movingLeft:
         case PlayerState::movingRight:
@@ -110,6 +131,9 @@ void Player::update(float dT)
         case PlayerState::idle:
             idle(dT);
             break;
+        case PlayerState::falling:
+            fall(dT);
+			break;
         }
 
         //this->state = State::iddle;
@@ -124,28 +148,48 @@ void Player::update(float dT)
 
         
         /*if (this->m_state == PlayerState::jumping) {
-			this->sprite->setTextureRect(sf::IntRect(3 * 32, 0, 32, 32));
+			
 		}
 		else if(m_state == PlayerState::idle) {
 			this->sprite->setTextureRect(sf::IntRect(0, 0, 32, 32));
 		}*/
+
+        // Flip sprite when velocity change direction
+        sf::Vector2f s = sprite->getScale();
+
+        if ((velocity.x < 0 && s.x > 0) || (velocity.x > 0 && s.x < 0)) {
+            this->sprite->setScale(-s.x, s.y);
+        }
+
+        if (velocity.x > speedCap.x) {
+            velocity.x = speedCap.x;
+        }
+        else if (velocity.x < -speedCap.x) {
+            velocity.x = -speedCap.x;
+        }
+
+        if (velocity.y > speedCap.y) {
+            velocity.y = speedCap.y;
+        }
+        else if (velocity.y < -speedCap.y) {
+            velocity.y = -speedCap.y;
+        }
+
+        velocity.y -= gravity * dT;
+
+        position += velocity;
+
+        // Call the parent update function
+	    //Pawn::update(dT);
+
+        // Check if the player is on the ground after the position update
+        /*if (this->velocity.y >= -0.01f && this->velocity.y <= 0.01f && m_controller != nullptr) {
+            if (!m_controller->jump()) {
+			    m_jumping = false;
+                this->m_state = PlayerState::idle;
+		    }
+	    }*/
 	}
-    sf::Vector2f s = sprite->getScale();
-
-    if ((velocity.x < 0 && s.x > 0) || (velocity.x > 0 && s.x < 0)) {
-        this->sprite->setScale(-s.x, s.y);
-    }
-
-    // Call the parent update function
-	Pawn::update(dT);
-
-    // Check if the player is on the ground after the position update
-    /*if (this->velocity.y >= -0.01f && this->velocity.y <= 0.01f && m_controller != nullptr) {
-        if (!m_controller->jump()) {
-			m_jumping = false;
-            this->m_state = PlayerState::idle;
-		}
-	}*/
 }
 
 void Player::setController(Controller* controller)
