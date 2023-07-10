@@ -44,6 +44,6 @@ void Actor::update(float dT)
 
 	position += velocity;
 
-	velocity.x *= 0.0f;
+
 }
 

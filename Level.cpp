@@ -39,6 +39,21 @@ void Level::testLevel()
 		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 0)));
 	}
 
+	for (int i = 6; i < 22; i++) {
+
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 16)));
+	}
+
+	for (int i = 8; i < 22; i++) {
+
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 2*16)));
+	}
+
+	for (int i = 10; i < 12; i++) {
+
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 3*16)));
+	}
+
 	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(0, 4 * 16)));
 
 	display->setBackgroundColor(sf::Color(92, 148, 252, 255));
@@ -64,6 +79,7 @@ void Level::update(float dT)
 		}
 
 		boundingBoxCollision(actor, dT);
+		actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
 	}
 }
 
@@ -101,8 +117,9 @@ void handleCollision(Actor* actor, GameObject* object, float dT)
 	//  - Handle collision with left side of object
 	//  - Hitbox with minus epsillon on the right 
 
-	
-
+	// Horizontal and vertical epsilon
+	glm::vec2 Eh = glm::vec2(2.0f, 0.0f);
+	glm::vec2 Ev = glm::vec2(0.0f, 2.0f);
 	glm::vec2 Ap = actor->getPosition();
 	glm::vec2 As = actor->getSize();
 	glm::vec2 Av = actor->getVelocity();
@@ -110,25 +127,26 @@ void handleCollision(Actor* actor, GameObject* object, float dT)
 	glm::vec2 Bp = object->getPosition();
 	glm::vec2 Bs = object->getSize();
 
-	
-
-	if (actor->getVelocity().x < 0 && intersects(Ap, Ap + As, Bp, Bp + Bs)) { // Moving left
-		actor->setPosition(glm::vec2(Bp.x + Bs.x, Ap.y));
-		actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
+	if (Av.y < 0 && intersects(Ap, Ap + As, Bp + Ev + Eh, Bp + Bs - Eh)) { // Falling
+		Ap.y = Bp.y + Bs.y;
+		Av.y = 0.0f;
 	}
 
- 	if (actor->getVelocity().x > 0 && intersects(Ap, Ap + As, Bp, Bp + Bs)) { // Moving right
-		actor->setPosition(glm::vec2(Bp.x, Ap.y));
-		actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
+	if (Av.y > 0 && intersects(Ap, Ap + As, Bp + Eh, Bp + Bs - Eh)) { // Rising
+		Ap.y = Bp.y - As.y;
+		Av.y = 0.0f;
 	}
 
-	if (Av.y < 0 && intersects(Ap, Ap + As, Bp + glm::vec2(0, 4.0f), Bp + Bs)) { // Falling
-		actor->setPosition(glm::vec2(Ap.x, Bp.y + Bs.y));
-		actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
+	if (Av.x < 0 && intersects(Ap, Ap + As, Bp + Ev, Bp + Bs - Ev)) { // Moving left
+		Ap.x = Bp.x + Bs.x;
+		Av.x = 0.0f;
 	}
 
-	if (Av.y > 0 && intersects(Ap, Ap + As, Bp, Bp + Bs)) { // Rising
-		actor->setPosition(glm::vec2(Ap.x, Bp.y - As.y));
-		actor->setVelocity(glm::vec2(actor->getVelocity().x, 0.0f));
+	if (Av.x > 0 && intersects(Ap, Ap + As, Bp + Ev , Bp + Bs - Ev)) { // Moving right
+		Ap.x = Bp.x - As.x;
+		Av.x = 0.0f;
 	}
+
+	actor->setPosition(Ap);
+	actor->setVelocity(Av);
 }
