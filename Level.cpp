@@ -139,8 +139,8 @@ void handleCollision(Actor* actor, GameObject* object, float dT)
 	//  - Hitbox with minus epsillon on the right 
 
 	// Horizontal and vertical epsilon
-	glm::vec2 Eh = glm::vec2(2.0f, 0.0f);
-	glm::vec2 Ev = glm::vec2(0.0f, 2.0f);
+	glm::vec2 Eh = glm::vec2(1.0f, 0.0f);
+	glm::vec2 Ev = glm::vec2(0.0f, 1.0f);
 
 	glm::vec2 Ap = actor->getPosition();
 	glm::vec2 As = actor->getSize();
@@ -148,7 +148,6 @@ void handleCollision(Actor* actor, GameObject* object, float dT)
 
 	glm::vec2 Bp = object->getPosition();
 	glm::vec2 Bs = object->getSize();
-
 	if (Av.y < 0 && intersects(Ap, Ap + As, Bp + Ev + Eh, Bp + Bs - Eh)) { // Falling
 		Ap.y = Bp.y + Bs.y;
 		Av.y = 0.0f;
