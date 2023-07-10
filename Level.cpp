@@ -63,8 +63,8 @@ void Level::testLevel()
 	}
 
 
-	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud1, glm::vec2(4 * 16 , 9 * 16)));
-	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud3, glm::vec2(5 * 16, 9 * 16)));
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud1, glm::vec2(2 * 16 , 9 * 16)));
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud3, glm::vec2(3 * 16, 9 * 16)));
 
 	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud1, glm::vec2(6 * 16, 7 * 16)));
 	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud2, glm::vec2(7 * 16, 7 * 16)));
@@ -86,16 +86,17 @@ void Level::testLevel()
 
 void Level::update(float dT)
 {
+	StaticObject* obj = nullptr;
+
 	for (auto actor : m_ActorList) {
 		// Call all actors' update function
 		actor->update(dT);
 
 		// Check for collisions
 		for (auto object : m_StaticObjectList) {
-			/*if (intersects(actor->getPosition(), actor->getPosition() + actor->getSize(), object->getPosition(), object->getPosition() + object->getSize())) {
-				handleCollision(actor, object, dT);
-			}*/
-			handleCollision(actor, object, dT);
+			obj = dynamic_cast<StaticObject*>(object);
+			if (obj != nullptr && obj->isSolid())
+				handleCollision(actor, obj, dT);
 		}
 
 		boundingBoxCollision(actor, dT);
