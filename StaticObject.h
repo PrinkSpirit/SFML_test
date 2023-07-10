@@ -24,5 +24,6 @@ protected:
 public:
 	StaticObject() = delete;
 	StaticObject(glm::vec2 pos, const sf::Texture &texture, float isSolid);
+	StaticObject(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture, float isSolid);
 	virtual ~StaticObject();
 };

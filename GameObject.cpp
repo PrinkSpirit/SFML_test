@@ -33,6 +33,8 @@ GameObject::GameObject(glm::vec2 pos, const sf::Texture &texture) :  position(po
 
 GameObject::GameObject(glm::vec2 pos, glm::vec2 size, const sf::Texture &texture) : position{ pos }, size{ size }
 {
+	this->sprite = new sf::Sprite();
+
 	this->sprite->setTexture(texture);
 	// Set the origin at the center of the object to facilitate sprite transformations
 	this->sprite->setOrigin(size.x / 2, size.y / 2);

@@ -11,6 +11,11 @@ StaticObject::StaticObject(glm::vec2 pos, const sf::Texture &texture, float isSo
 {
 }
 
+StaticObject::StaticObject(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture, float isSolid) :
+	GameObject(pos, size, texture), isSolid(isSolid), id(counter++)
+{
+}
+
 StaticObject::~StaticObject()
 {
 

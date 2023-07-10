@@ -13,6 +13,15 @@
 enum class ObjectType {
 	Link,	// The player in side-scrolling sections
 	Brick,	// Simple wall element.
+	Block,
+	Dirt,	// Simple ground element.
+	Cloud1,
+	Cloud2,
+	Cloud3,
+	pillarHead,
+	pillar,
+	armorTop,
+	armorBottom,
 };
 
 /// <summary>

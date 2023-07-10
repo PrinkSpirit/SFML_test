@@ -10,11 +10,11 @@ void ObjectFactory::loadTexture(ObjectType type)
 	sf::Texture* texture = new sf::Texture();
 	try {
 		switch (type) {
-		case ObjectType::Brick:			
-				texture->loadFromFile("./sprites/brick.png");
+		case ObjectType::Brick:
+				texture->loadFromFile("./sprites/Blocks.png");
 			break;
 		case ObjectType::Link:
-				texture->loadFromFile("./sprites/Link.bmp");
+				texture->loadFromFile("./sprites/Link.png");
 			break;
 		default:
 			break;
@@ -39,16 +39,23 @@ sf::Texture* ObjectFactory::getTexture(ObjectType type)
 			loadTexture(ObjectType::Link);
 		return m_textureMap[ObjectType::Link];
 	case ObjectType::Brick:
+	case ObjectType::Block:
+	case ObjectType::Dirt:
+	case ObjectType::Cloud1:
+	case ObjectType::Cloud2:
+	case ObjectType::Cloud3:
+	case ObjectType::pillarHead:
+	case ObjectType::pillar:
+	case ObjectType::armorTop:
+	case ObjectType::armorBottom:
+		// If texture is not in our map we load it
 		if (m_textureMap.find(ObjectType::Brick) == m_textureMap.end())
 			loadTexture(ObjectType::Brick);
 		return m_textureMap[ObjectType::Brick];
 	default:
 		break;
 	}
-
-	
-		loadTexture(type);
-	
+	return nullptr;
 }
 
 ObjectFactory::~ObjectFactory()

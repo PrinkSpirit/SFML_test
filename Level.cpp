@@ -35,11 +35,11 @@ Player* Level::getPlayer()
 void Level::testLevel()
 {
 	for (int i = 0; i < 22; i++) {
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 0 * 16)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Dirt, glm::vec2(i * 16, 0 * 16)));
 	}
 
 	for (int i = 0; i < 22; i++) {
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 1 * 16)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Dirt, glm::vec2(i * 16, 1 * 16)));
 	}
 
 	for (int i = 6; i < 22; i++) {
@@ -51,19 +51,30 @@ void Level::testLevel()
 	}
 
 	for (int i = 10; i < 12; i++) {
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 4*16)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Block, glm::vec2(i * 16, 4*16)));
 	}
 
 	for (int i = 10; i < 16; i++) {
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 14 * 16)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 12 * 16)));
 	}
 
 	for (int i = 11; i < 16; i++) {
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 13 * 16)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 11 * 16)));
 	}
 
 
-	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(0, 4 * 16)));
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud1, glm::vec2(4 * 16 , 9 * 16)));
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud3, glm::vec2(5 * 16, 9 * 16)));
+
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud1, glm::vec2(6 * 16, 7 * 16)));
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Cloud2, glm::vec2(7 * 16, 7 * 16)));
+
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::armorTop, glm::vec2(10 * 16, 6 * 16)));
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::armorBottom, glm::vec2(10 * 16, 5 * 16)));
+
+	for (int i = 4; i < 10; i++)
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::pillar, glm::vec2(14 * 16, i * 16)));
+	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::pillarHead , glm::vec2(14 * 16, 10 * 16)));
 
 	display->setBackgroundColor(sf::Color(92, 148, 252, 255));
 

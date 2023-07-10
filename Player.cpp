@@ -10,7 +10,7 @@ Player::Player(glm::vec2 pos, const sf::Texture& texture) : Pawn(pos, texture)
 
     // Reference to the iddle position on the sprite sheet
     this->sprite->setTextureRect(sf::IntRect(0, 0, 32, 32)); 
-    this->size = { sprite->getTextureRect().width / 1.5, sprite->getTextureRect().height};
+    this->size = { sprite->getTextureRect().width / 1.33, sprite->getTextureRect().height};
     this->sprite->setOrigin(size.x/2.0f, size.y/2.0f);
 
     m_animations.push_back(sf::IntRect(0, 0, 32, 32));  // Iddle / Walk 1
