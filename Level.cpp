@@ -120,6 +120,7 @@ void handleCollision(Actor* actor, GameObject* object, float dT)
 	// Horizontal and vertical epsilon
 	glm::vec2 Eh = glm::vec2(2.0f, 0.0f);
 	glm::vec2 Ev = glm::vec2(0.0f, 2.0f);
+
 	glm::vec2 Ap = actor->getPosition();
 	glm::vec2 As = actor->getSize();
 	glm::vec2 Av = actor->getVelocity();
@@ -132,7 +133,7 @@ void handleCollision(Actor* actor, GameObject* object, float dT)
 		Av.y = 0.0f;
 	}
 
-	if (Av.y > 0 && intersects(Ap, Ap + As, Bp + Eh, Bp + Bs - Eh)) { // Rising
+	if (Av.y > 0 && intersects(Ap, Ap + As, Bp + Eh, Bp + Bs - Ev - Eh)) { // Rising
 		Ap.y = Bp.y - As.y;
 		Av.y = 0.0f;
 	}
