@@ -35,24 +35,33 @@ Player* Level::getPlayer()
 void Level::testLevel()
 {
 	for (int i = 0; i < 22; i++) {
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 0 * 16)));
+	}
 
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 0)));
+	for (int i = 0; i < 22; i++) {
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 1 * 16)));
 	}
 
 	for (int i = 6; i < 22; i++) {
-
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 16)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 2 * 16)));
 	}
 
 	for (int i = 8; i < 22; i++) {
-
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 2*16)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 3*16)));
 	}
 
 	for (int i = 10; i < 12; i++) {
-
-		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 3*16)));
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 4*16)));
 	}
+
+	for (int i = 10; i < 16; i++) {
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 14 * 16)));
+	}
+
+	for (int i = 11; i < 16; i++) {
+		m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(i * 16, 13 * 16)));
+	}
+
 
 	m_StaticObjectList.push_back(BlockFactory::Instance()->createObject(ObjectType::Brick, glm::vec2(0, 4 * 16)));
 
