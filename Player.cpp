@@ -40,7 +40,7 @@ void Player::jump(float dT)
         this->m_state = PlayerState::jumping;
 		m_jumping = true;
 		velocity.y = m_speed.y / 7500.0f;
-        this->sprite->setTextureRect(sf::IntRect(3 * 32, 0, 32, 32));
+        this->sprite->setTextureRect(m_animations[5]);
 	}
     if (m_state == PlayerState::jumping) {
         if (m_controller->left()) {  // Lateral air control
@@ -57,7 +57,7 @@ void Player::jump(float dT)
 
 void Player::fall(float dT)
 {
-    this->sprite->setTextureRect(sf::IntRect(3 * 32, 0, 32, 32));
+    this->sprite->setTextureRect(m_animations[5]);
     if (m_controller->left()) {  // Lateral air control
         this->velocity.x -= this->m_speed.x * dT;
     }
