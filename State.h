@@ -5,7 +5,7 @@
 class State
 {
 protected:
-	Actor* actor;
+	Actor* m_actor;
 
 public:
 	void stateEntry();
@@ -14,5 +14,6 @@ public:
 
 	State() = delete;
 	State(Actor* actor);
+	virtual ~State();
 };
 

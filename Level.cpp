@@ -79,7 +79,7 @@ void Level::testLevel()
 	display->setBackgroundColor(sf::Color(92, 148, 252, 255));
 
 
-	this->player = (Player*)ActorFactory::Instance()->createPlayer(ObjectType::Link, glm::vec2(4 * 16, 4 * 16));
+	this->player = (Player*)ActorFactory::Instance()->createPlayer(ObjectType::Link, glm::vec2(1 * 16, 4 * 16));
 	m_ActorList.push_back(player);
 }
 
