@@ -17,6 +17,8 @@ protected:
 	bool needUpdate = false;				// Whether the actor need to be updated or not. Unused.
 	float m_animTimer = 0.0f;					// Timer used for animation
 
+	std::map<std::string, State*> states;
+
 public: 
 	Actor();
 	Actor(glm::vec2 pos, const sf::Texture &texture);
@@ -52,5 +54,7 @@ public:
 	/// </summary>
 	/// <param name="dT">delta Time</param>
 	virtual void update(float dT);
+
+	virtual void switchState(std::string nextState);
 };
 

@@ -1,19 +1,19 @@
 #pragma once
 
-#include "Actor.h"
+class Actor;
 
-class State
+class ActorState
 {
 protected:
 	Actor* m_actor;
 
 public:
-	void stateEntry();
-	void stateUpdate();
-	void stateExit();
+	virtual void in() = 0;
+	virtual void update() = 0;
+	virtual void out() = 0;
 
-	State() = delete;
-	State(Actor* actor);
-	virtual ~State();
+	ActorState() = delete;
+	ActorState(Actor* actor);
+	virtual ~ActorState();
 };
 

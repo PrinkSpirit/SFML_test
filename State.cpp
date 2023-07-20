@@ -1,21 +1,11 @@
 #include "State.h"
 
-void State::stateEntry()
+
+ActorState::ActorState(Actor* actor) : m_actor(actor)
 {
 }
 
-void State::stateUpdate()
+ActorState::~ActorState()
 {
-}
-
-void State::stateExit()
-{
-}
-
-State::State(Actor* actor) : m_actor(actor)
-{
-}
-
-State::~State()
-{
+	m_actor = nullptr;
 }

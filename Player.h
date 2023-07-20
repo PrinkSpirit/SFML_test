@@ -1,6 +1,7 @@
 #pragma once
 #include "Pawn.h"
 #include "Controller.h"
+#include "State.h"
 
 enum class PlayerState
 {
@@ -25,6 +26,10 @@ protected:
 
 	Controller* m_controller = nullptr;			/// Pointer to the control manager
 	std::vector< sf::IntRect > m_animations;    /// Vector of the sprites for the animation
+
+	class iddle : public ActorState {
+
+	};
 
 public:
 	Player();
