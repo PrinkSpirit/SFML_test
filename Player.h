@@ -3,33 +3,22 @@
 #include "Controller.h"
 #include "State.h"
 
-enum class PlayerState
-{
-	idle,
-	movingLeft,
-	movingRight,
-	jumping,
-	falling,
-	crouching,
-	attacking,
-	hurt,
-	dead
-};
-
 class Player : public Pawn
 {
 protected:
 	bool m_jumping = false; /// Whether the player is jumping.
 	bool m_grounded = false; /// Whether the player is on the ground.
 
-	PlayerState m_state = PlayerState::idle; /// The current state of the player.
+	PlayerState* m_state; /// The current state of the player.
 
 	Controller* m_controller = nullptr;			/// Pointer to the control manager
 	std::vector< sf::IntRect > m_animations;    /// Vector of the sprites for the animation
 
-	class iddle : public ActorState {
-
-	};
+	class Idle;
+	class Walk;
+	class Jump;
+	class Crouch;
+	class Attack;
 
 public:
 	Player();
@@ -78,3 +67,17 @@ public:
 	Controller* getController() const;
 };
 
+
+
+class Player::Idle : public PlayerState {
+	void in(float dT);
+	void out(float dT);
+	void update(float dT);
+
+	Idle(Player*);
+};
+
+class Player::Walk;
+class Player::Jump;
+class Player::Crouch;
+class Player::Attack;
