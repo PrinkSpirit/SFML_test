@@ -8,166 +8,48 @@ Player::Player(glm::vec2 pos, const sf::Texture& texture) : Pawn(pos, texture)
 {
 	m_speed = glm::vec2(100.0f,200.0f); // Speed, magic number.
 
-    // Reference to the iddle position on the sprite sheet
-    this->sprite->setTextureRect(sf::IntRect(0, 0, 32, 32)); 
+    m_states["Idle"] = new CanFall<CanMove<CanWalk<CanJump<Idle>>>>{this};
+    m_states["Walk"] = new CanFall<CanMove<CanJump<Walk>>>{this};
+    m_states["Jump"] = new CanFall<CanMove<Jump>>{this};
+
+    // Default state
+    m_state = m_states["Idle"];
+    m_state->in(0.0f);
+
+    // Hurtbox
     this->size = { sprite->getTextureRect().width / 1.33, sprite->getTextureRect().height};
     this->sprite->setOrigin(size.x/2.0f, size.y/2.0f);
-
-    m_animations.push_back(sf::IntRect(0, 0, 32, 32));  // Iddle / Walk 1
-    m_animations.push_back(sf::IntRect(64, 0, 32, 32)); // Walk 2
-    m_animations.push_back(sf::IntRect(96, 0, 32, 32)); // Walk 3
-    m_animations.push_back(sf::IntRect(32, 0, 32, 32)); // Walk 4
-    m_animations.push_back(sf::IntRect(64, 0, 32, 32)); // Walk 5
-    m_animations.push_back(sf::IntRect(96, 0, 32, 32)); // Walk 6 / jumping
 }
 
-Player::Player(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture) : Pawn(pos, size, texture)
-{
-}
+//Player::Player(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture) : Pawn(pos, size, texture)
+//{
+//}
 
 Player::~Player()
 {
 }
 
-bool Player::isJumping() const
-{
-	return m_jumping;
-}
-
-void Player::jump(float dT)
-{
-    if (m_state!=PlayerState::jumping) {
-        this->m_state = PlayerState::jumping;
-		m_jumping = true;
-		velocity.y = m_speed.y / 7500.0f;
-        this->sprite->setTextureRect(sf::IntRect(3 * 32, 0, 32, 32));
-	}
-    if (m_state == PlayerState::jumping) {
-        if (m_controller->left()) {  // Lateral air control
-            this->velocity.x -= this->m_speed.x * dT;
-        }
-		else if (m_controller->right()) {
-			this->velocity.x += this->m_speed.x * dT;
-		}
-    }
-    if (velocity.y < 0 - FLT_EPSILON) {
-        m_state = PlayerState::falling;
-    }
-}
-
-void Player::fall(float dT)
-{
-    this->sprite->setTextureRect(sf::IntRect(3 * 32, 0, 32, 32));
-    if (m_controller->left()) {  // Lateral air control
-        this->velocity.x -= this->m_speed.x * dT;
-    }
-    else if (m_controller->right()) {
-        this->velocity.x += this->m_speed.x * dT;
-    }
-    if (velocity.y > -FLT_EPSILON) {
-        m_state = PlayerState::idle;
-    }
-}
-
-void Player::idle(float dT)
-{
-    if (m_controller->left() || m_controller->right()) {
-        move(dT);
-	} else if (m_controller->jump()) {
-        jump(dT);
-	}
-    if (velocity.y < -FLT_EPSILON) {
-        m_state = PlayerState::falling;
-    }
-}
-
-void Player::move(float dT)
-{    
-    if (m_controller->left() && m_state == PlayerState::movingLeft) {  // If the player is still moving in the same direction
-        this->velocity.x -= this->m_speed.x * dT;
-        this->m_animTimer += dT;    // We increment the animation timer
-    } 
-    else if (m_controller->left()) { // else
-        this->velocity.x -= this->m_speed.x * dT;
-        this->m_animTimer = 0.0f;   // We reset the animation timer
-        m_state = PlayerState::movingLeft; // And set the state to moving left
-    }
-
-    if (m_controller->right() && m_state == PlayerState::movingRight) {
-        this->velocity.x += this->m_speed.x * dT;
-        this->m_animTimer += dT;
-    } 
-    else if (m_controller->right() ) {  
-        this->velocity.x += this->m_speed.x * dT;
-        this->m_animTimer = 0.0f;       
-        m_state = PlayerState::movingRight;
-    }
-
-    // Set the animation frame, may be moved in the future
-    if (this->m_state == PlayerState::movingLeft || this->m_state == PlayerState::movingRight) {
-        this->sprite->setTextureRect(m_animations[((int)(this->m_animTimer * 12) % 6)]);
-    }
-
-    if(m_controller->jump()) {
-		jump(dT);
-	}
-    if (velocity.y < -FLT_EPSILON) {
-        m_state = PlayerState::falling;
-    }
-}
-
 void Player::update(float dT)
 {
-    //std::cout << (int)m_state << std::endl;
 	if (m_controller != nullptr) {
-        switch (m_state) {
-        case PlayerState::movingLeft:
-        case PlayerState::movingRight:
-            move(dT);
-            break;
-        case PlayerState::jumping:
-            jump(dT);
-            break;
-        case PlayerState::idle:
-            idle(dT);
-            break;
-        case PlayerState::falling:
-            fall(dT);
-			break;
-        }
-
-        //this->state = State::iddle;
+        //Cheat code
         if (m_controller->up()) {
-            //move(glm::vec2(0, 1));
             this->velocity.y += this->m_speed.y * dT;
         }
         if (m_controller->down()) {
-            //move(glm::vec2(0, -1));
             this->velocity.y -= this->m_speed.y * dT;
         }
 
-        
-        /*if (this->m_state == PlayerState::jumping) {
-			
-		}
-		else if(m_state == PlayerState::idle) {
-			this->sprite->setTextureRect(sf::IntRect(0, 0, 32, 32));
-		}*/
 
-        // Flip sprite when velocity change direction
-        sf::Vector2f s = sprite->getScale();
+        m_state->update(dT);
 
-        if ((velocity.x < 0 && s.x > 0) || (velocity.x > 0 && s.x < 0)) {
-            this->sprite->setScale(-s.x, s.y);
-        }
-
+        // Applying velocity cap
         if (velocity.x > speedCap.x) {
             velocity.x = speedCap.x;
         }
         else if (velocity.x < -speedCap.x) {
             velocity.x = -speedCap.x;
         }
-
         if (velocity.y > speedCap.y) {
             velocity.y = speedCap.y;
         }
@@ -175,20 +57,11 @@ void Player::update(float dT)
             velocity.y = -speedCap.y;
         }
 
-        velocity.y -= gravity * dT;
-
         position += velocity;
 
         // Call the parent update function
 	    //Pawn::update(dT);
 
-        // Check if the player is on the ground after the position update
-        /*if (this->velocity.y >= -0.01f && this->velocity.y <= 0.01f && m_controller != nullptr) {
-            if (!m_controller->jump()) {
-			    m_jumping = false;
-                this->m_state = PlayerState::idle;
-		    }
-	    }*/
 	}
 }
 
@@ -201,3 +74,147 @@ Controller* Player::getController() const
 {
     return this->m_controller;
 }
+
+Player::PlayerState::PlayerState(Player* player) : m_player(player)
+{
+}
+
+Player::PlayerState::~PlayerState()
+{
+    m_player = nullptr;
+}
+
+
+/* ********** ********** ********** ********** ********** */
+/*                          Idle                          */
+/* ********** ********** ********** ********** ********** */
+Player::Idle::Idle(Player* player) : PlayerState(player), m_spriteRect(0, 0, 32, 32)
+{
+    
+}
+
+
+Player::Idle::~Idle()
+{
+
+}
+
+
+void Player::Idle::in(float dT)
+{
+    m_player->sprite->setTextureRect(m_spriteRect);
+}
+
+void Player::Idle::update(float dT)
+{
+}
+
+void Player::Idle::out(float dT)
+{
+
+}
+/* ********** ********** ********** ********** ********** */
+/*                          Walk                          */
+/* ********** ********** ********** ********** ********** */
+
+Player::Walk::Walk(Player* player) : PlayerState(player),
+    m_animationSequence({
+        sf::IntRect(0,0,32,32),     // Walk 1
+        sf::IntRect(64,0,32,32),    // Walk 2
+        sf::IntRect(96, 0, 32, 32), // Walk 3
+        sf::IntRect(32, 0, 32, 32), // Walk 4
+        sf::IntRect(64, 0, 32, 32), // Walk 5
+        sf::IntRect(96, 0, 32, 32)  // Walk 6
+    })
+{
+
+}
+
+Player::Walk::~Walk()
+{
+
+}
+
+void Player::Walk::in(float dT)
+{
+    m_animationTimer = 0.0f;
+    m_idleTimer = 0.0f;
+	m_player->sprite->setTextureRect(m_animationSequence[0]);
+}
+
+void Player::Walk::out(float dT)
+{
+
+}
+
+void Player::Walk::update(float dT)
+{
+    // If the player is moving, play the walk animation
+    if (m_player->velocity.x < -FLT_EPSILON || m_player->velocity.x > FLT_EPSILON) {
+        m_idleTimer = 0.0f;
+	    m_animationTimer += dT;
+
+		m_player->sprite->setTextureRect(m_animationSequence[((int)(m_animationTimer * 12) % 6)]);
+	} 
+    // If the player is not moving since 2 seconds, switch to idle
+    else if(m_idleTimer >= 2.0f) { 
+        m_idleTimer += dT;
+
+        if (dT >= 2.0f) {
+            m_player->switchState("Idle");
+            return;
+        }
+    }
+}
+
+/* ********** ********** ********** ********** ********** */
+/*                          Jump                          */
+/* ********** ********** ********** ********** ********** */
+
+Player::Jump::Jump(Player* player) : PlayerState(player), 
+    m_spriteRect(96, 0, 32, 32), m_jumpMaxDuration(.1f)
+{
+}
+
+Player::Jump::~Jump()
+{
+}
+
+void Player::Jump::in(float dT)
+{
+    m_player->sprite->setTextureRect(m_spriteRect);
+	//m_player->velocity.y = m_player->m_speed.y / 7500.0f;
+	
+    m_player->m_jumping = true;
+    m_player->m_grounded = false;
+
+    m_jumpHeldTimer = 0.0f;    
+    m_jumpHeld = true;
+}
+
+void Player::Jump::out(float dT)
+{
+	m_player->m_jumping = false;
+}
+
+void Player::Jump::update(float dT)
+{
+    // If the player is jumping for more than 4 seconds, or is no longer 
+    // holding the jump button, he will stop rising
+    if (m_jumpHeldTimer > m_jumpMaxDuration || !m_player->getController()->jump()) {
+        m_jumpHeld = false;
+        m_player->m_jumping = false;
+    }
+	// Else if the jump button is held, the player will jump higher
+    else if (m_jumpHeldTimer <= m_jumpMaxDuration && m_player->getController()->jump() && m_jumpHeld) {
+        m_jumpHeldTimer += dT;
+		m_player->velocity.y = m_player->m_speed.y * dT;
+	}
+
+    if (m_player->velocity.y >= -FLT_EPSILON && m_player->velocity.y <= FLT_EPSILON) {
+        m_player->m_grounded = true;
+        m_player->switchState("Idle");
+    }
+}
+
+

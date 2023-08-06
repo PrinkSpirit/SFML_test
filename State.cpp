@@ -1,6 +1,10 @@
 #include "State.h"
 
 
+State::State()
+{
+}
+
 State::~State()
 {
 }
@@ -14,10 +18,3 @@ ActorState::~ActorState()
 	m_actor = nullptr;
 }
 
-PlayerState::PlayerState(Actor* actor)
-{
-}
-
-PlayerState::~PlayerState()
-{
-}

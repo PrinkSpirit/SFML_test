@@ -1,14 +1,6 @@
 #pragma once
 #include "Actor.h"
 
-enum class State
-{
-	iddle,
-	movingLeft,
-	movingRight,
-	jumping,
-	attacking
-};
 
 class Pawn : public Actor
 {

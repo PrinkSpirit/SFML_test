@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Display.h"
+#include "State.h"
 
 
 /// <summary>
@@ -17,7 +18,8 @@ protected:
 	bool needUpdate = false;				// Whether the actor need to be updated or not. Unused.
 	float m_animTimer = 0.0f;					// Timer used for animation
 
-	std::map<std::string, State*> states;
+	std::map<std::string, State*> m_states;
+	State* m_state = nullptr;
 
 public: 
 	Actor();
@@ -55,6 +57,8 @@ public:
 	/// <param name="dT">delta Time</param>
 	virtual void update(float dT);
 
+	/// @brief Switch to the desired state.
+	/// @param nextState Name of the next state.
 	virtual void switchState(std::string nextState);
 };
 
