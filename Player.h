@@ -3,6 +3,7 @@
 #include "Controller.h"
 #include "State.h"
 
+/// @brief Player class.
 class Player : public Pawn
 {
 protected:
@@ -11,23 +12,28 @@ protected:
 
 	Controller* m_controller = nullptr;			/// Pointer to the control manager
 
-	class PlayerState;
-	class Idle;
-	class Walk;
-	class Jump;
-	class Crouch;
-	class Attack;
+	// Player states
+	class PlayerState;	// Abstract base class for other states
+	class Idle;			// Idle state
+	class Walk;			// Walking state
+	class Jump;			// Jumping state
+	class Crouch;		// Crouching state
+	class Attack;		// Attacking state
+	class CrouchStab;	// Crouch attack state
 
+	// State decorators
 	template <class T>
-	class CanFall;
+	class CanFall;		// Allow state to handle gravity
 	template <class T>
-	class CanMove;
+	class CanMove;		// Allow state to handle horizontal movement
 	template <class T>
-	class CanJump;
+	class CanJump;		// Allow state to switch to jumping state via the jump action
 	template <class T>
-	class CanWalk;
+	class CanWalk;		// Allow state to switch to walking state via grounded movement
 	template <class T>
-	class CanCrouch;
+	class CanCrouch;	// Allow state to switch to crouching state via the down action
+	template <class T>
+	class CanAttack;	// Allow state to switch to attacking state via the attack action
 
 
 public:
@@ -51,8 +57,11 @@ public:
 };
 
 
-/* ---------- States ---------- */
-/// @brief State base class for players.
+/* ********** ********** ********** ********** ********** */
+/*							STATES	                      */
+/* ********** ********** ********** ********** ********** */
+
+/// @brief State base class for players. Abstract.
 class Player::PlayerState : public State {
 protected:
 	/// @brief Pointer to the player.
@@ -91,8 +100,6 @@ class Player::Walk : public PlayerState {
 protected:
 	std::vector<sf::IntRect> m_animationSequence;
 	float m_animationTimer = 0.0f;
-	float m_idleTimer = 0.0f;
-
 
 public:
 	void in(float dT);
@@ -103,7 +110,7 @@ public:
 	~Walk();
 };
 
-/// @brief Jumping.
+/// @brief Jumping state.
 class Player::Jump : public PlayerState {
 protected:
 	sf::IntRect m_spriteRect;
@@ -121,6 +128,7 @@ public:
 	~Jump();
 };
 
+/// @brief Crouched state.
 class Player::Crouch : public PlayerState {
 protected:
 	sf::IntRect m_spriteRect;
@@ -134,14 +142,41 @@ public:
 	~Crouch();
 };
 
-class Player::Attack;
+/// @brief Attacking state.
+class Player::Attack : public PlayerState {
+protected:
+	std::vector<sf::IntRect> m_animationSequence;
+	float m_animationTimer = 0.0f;
 
+public:
+	void in(float dT);
+	void out(float dT);
+	void update(float dT);
 
-/* ---------- Decorators ---------- */
+	Attack(Player*);
+	~Attack();
+};
 
-/* ---------- State Action ---------- */
-;
-/// @brief Handle horizontal movement for the current state.
+class Player::CrouchStab : public PlayerState {
+protected:
+	std::vector<sf::IntRect> m_animationSequence;
+	float m_animationTimer = 0.0f;
+
+public:
+	void in(float dT);
+	void out(float dT);
+	void update(float dT);
+
+	CrouchStab(Player*);
+	~CrouchStab();
+};
+
+/* ********** ********** ********** ********** ********** */
+/*                     STATES DECORATOR                   */
+/* ********** ********** ********** ********** ********** */
+
+/// @brief'Handle horizontal movement for the current state. Décorator.
+/// @tparam T Child of PlayerState
 template <class T>
 class Player::CanMove : public T {
 	static_assert(std::is_base_of<Player::PlayerState, T>::value, "Target State must derive from PlayerState");
@@ -179,14 +214,14 @@ public:
 		T::update(dT);
 	}
 
-
+	// Allow transfer of arguments to the constructor of the decorated state to next in line.
 	template <typename... Args>
 	CanMove(Args... args) : T(std::forward<Args>(args)...) {}
 
 	~CanMove() {}
 };
 
-/// @brief Handle gravity for the current state. Indicate that the player can fall.
+/// @brief Handle gravity for the current state. Indicate that the player can fall. Décorator.
 /// @tparam T Child of PlayerState
 template <class T>
 class Player::CanFall : public T {
@@ -209,7 +244,7 @@ public:
 		}
 	}
 
-
+	// Allow transfer of arguments to the constructor of the decorated state to next in line.
 	template <typename... Args>
 	CanFall(Args... args) : T(std::forward<Args>(args)...) {}
 
@@ -218,7 +253,7 @@ public:
 
 /* -------- State Switchers ---------- */
 
-/// @brief Handle the jumping action in the decorated state.
+/// @brief Handle the jumping action in the decorated state. Décorator.
 /// @tparam T Child of PlayerState
 template <class T>
 class Player::CanJump : public T {
@@ -243,7 +278,7 @@ public:
 		T::update(dT);
 	}
 
-
+	// Allow transfer of arguments to the constructor of the decorated state to next in line.
 	template <typename... Args>
 	CanJump(Args... args) : T(std::forward<Args>(args)...) {}
 
@@ -252,7 +287,7 @@ public:
 
 
 
-/// @brief Check for left and right actions while grounded.
+/// @brief Check for left and right actions while grounded. Décorator.
 /// @tparam T Child of PlayerState
 template <class T>
 class Player::CanWalk : public T {
@@ -276,14 +311,15 @@ public:
 		T::update(dT);
 	}
 
-
+	// Allow transfer of arguments to the constructor of the decorated state to next in line.
 	template <typename... Args>
 	CanWalk(Args... args) : T(std::forward<Args>(args)...) {}
 };
 
-// can crouch
+/// @brief Handle switching to the crouch state. Décorator.
+/// @tparam T Child of PlayerState
 template <class T>
-class Player::CanCrouch : public T {
+class Player::CanCrouch : public T { 
 	static_assert(std::is_base_of<Player::PlayerState, T>::value, "T must derive from PlayerState");
 
 public:
@@ -303,9 +339,34 @@ public:
 		T::update(dT);
 	}
 
-
+	// Allow transfer of arguments to the constructor of the decorated state to next in line.
 	template <typename... Args>
 	CanCrouch(Args... args) : T(std::forward<Args>(args)...) {}
 };
 
 // can attack
+template <class T>
+class Player::CanAttack : public T {
+	static_assert(std::is_base_of<Player::PlayerState, T>::value, "T must derive from PlayerState");
+
+public:
+	void in(float dT) {
+		T::in(dT);
+	}
+
+	void out(float dT) {
+		T::out(dT);
+	}
+
+	void update(float dT) {
+		if (T::m_player->getController()->attack()) {
+			T::m_player->switchState("Attack");
+			return; // Return on state change
+		}
+		T::update(dT);
+	}
+
+	// Allow transfer of arguments to the constructor of the decorated state to next in line.
+	template <typename... Args>
+	CanAttack(Args... args) : T(std::forward<Args>(args)...) {}
+};

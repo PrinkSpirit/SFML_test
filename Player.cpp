@@ -8,10 +8,12 @@ Player::Player(glm::vec2 pos, const sf::Texture& texture) : Pawn(pos, texture)
 {
 	m_speed = glm::vec2(100.0f,200.0f); // Speed, magic number.
 
-    m_states["Idle"] = new CanFall<CanCrouch<CanMove<CanWalk<CanJump<Idle>>>>>{this};
-    m_states["Walk"] = new CanFall<CanMove<CanCrouch<CanJump<Walk>>>>{this};
-    m_states["Jump"] = new CanFall<CanMove<Jump>>{this};
-    m_states["Crouch"] = new CanFall<CanJump<Crouch>>{this};
+    m_states["Idle"] =          new CanFall<CanCrouch<CanMove<CanWalk<CanJump<CanAttack<Idle>>>>>>{this};
+    m_states["Walk"] =          new CanFall<CanMove<CanCrouch<CanJump<CanAttack<Walk>>>>>{this};
+    m_states["Jump"] =          new CanFall<CanMove<CanAttack<Jump>>>{this};
+    m_states["Crouch"] =        new CanFall<CanJump<Crouch>>{this};
+    m_states["Attack"] =        new CanFall<Attack>{this};
+    m_states["CrouchStab"] =    new CanFall<CrouchStab>{this};
     
 
     // Default state
@@ -138,7 +140,6 @@ Player::Walk::~Walk()
 void Player::Walk::in(float dT)
 {
     m_animationTimer = 0.0f;
-    m_idleTimer = 0.0f;
 	m_player->sprite->setTextureRect(m_animationSequence[0]);
 }
 
@@ -242,5 +243,83 @@ void Player::Crouch::update(float dT)
 {
     if (!m_player->getController()->down()) {
 		m_player->switchState("Idle");
+	} 
+    if (m_player->getController()->down() && m_player->getController()->attack()) {
+		m_player->switchState("CrouchStab");
 	}
 }
+
+/* ********** ********** ********** ********** ********** */
+/*                         Attack                         */
+/* ********** ********** ********** ********** ********** */
+
+Player::Attack::Attack(Player* player) : PlayerState(player),
+    m_animationSequence({
+        sf::IntRect(0, 32, 32, 32),     // Attack 1
+        sf::IntRect(32, 32, 32, 32), // Attack 2
+    })
+{
+}
+
+Player::Attack::~Attack() {
+}
+
+void Player::Attack::in(float dT) {
+    m_player->sprite->setTextureRect(m_animationSequence[0]);
+    m_animationTimer = 0.1f;
+    // Enable hitbox
+}
+
+void Player::Attack::out(float dT) {
+    // Disable hitbox
+}
+
+void Player::Attack::update(float dT) {
+    m_animationTimer += dT;
+
+    if (m_animationTimer >= 0.7f) {
+		m_player->switchState("Idle");
+	}
+    else {
+		m_player->sprite->setTextureRect(m_animationSequence[((int)(m_animationTimer * 4) % 2)]);
+	}
+}
+
+/* ********** ********** ********** ********** ********** */
+/*                       Crouch Stab                      */
+/* ********** ********** ********** ********** ********** */
+
+Player::CrouchStab::CrouchStab(Player* player) : PlayerState(player),
+    m_animationSequence({
+		sf::IntRect(64, 32, 32, 32), // Attack 1
+		sf::IntRect(96, 32, 32, 32), // Attack 2
+	})
+{
+
+}
+
+Player::CrouchStab::~CrouchStab() {
+    
+}
+
+void Player::CrouchStab::in(float dT) {
+    m_player->sprite->setTextureRect(m_animationSequence[0]);
+    m_animationTimer = 0.1f;
+    // Enable hitbox
+}
+
+void Player::CrouchStab::out(float dT) {
+    // Disable hitbox
+}
+
+void Player::CrouchStab::update(float dT) {
+    m_animationTimer += dT;
+
+    if (m_animationTimer >= 0.7f) {
+        m_player->switchState("Crouch");
+    }
+    else {
+        m_player->sprite->setTextureRect(m_animationSequence[((int)(m_animationTimer * 4) % 2)]);
+    }
+}
+

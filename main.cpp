@@ -37,7 +37,6 @@ int main()
     currentTime = lastTime = clock.restart();
     while (display->isWindowOpen())
     {
-
         sf::Event event;
         while (display->getWindow()->pollEvent(event))
         {
@@ -58,7 +57,7 @@ int main()
         dT = clock.restart().asSeconds();
         level.update(dT);
         ui.update(dT);
-        //std::cout << "plop" << std::endl;
+
         std::this_thread::sleep_for(std::chrono::seconds(1/60));
     }
 
