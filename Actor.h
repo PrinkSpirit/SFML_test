@@ -1,25 +1,24 @@
 #pragma once
+
 #include "GameObject.h"
 #include "Display.h"
 #include "State.h"
 
 
-/// <summary>
-/// Represents elements that can move or be interacted with like hearts, doors, keys, etc.
-/// </summary>
+/// @brief Represents elements that can move or be interacted with like hearts, doors, keys, etc.
 class Actor : public GameObject
 {
 protected:
-	glm::vec2 velocity{0.0f,0.0f};			// Momentum of the actor
-	glm::vec2 speedCap{ 200.0f,200.0f };	// Maximum speed of the actor
+	glm::vec2 velocity{0.0f,0.0f};				///< Momentum of the actor
+	glm::vec2 speedCap{ 200.0f,200.0f };		///< Maximum speed of the actor
 
-	float gravity = .06f;					// Gravity applied to the actor
+	float gravity = .06f;						///< Gravity applied to the actor
 
-	bool needUpdate = false;				// Whether the actor need to be updated or not. Unused.
-	float m_animTimer = 0.0f;					// Timer used for animation
+	bool needUpdate = false;					///< Whether the actor need to be updated or not. Unused.
+	float m_animTimer = 0.0f;					///< Timer used for animation
 
-	std::map<std::string, State*> m_states;
-	State* m_state = nullptr;
+	std::map<std::string, State*> m_states;		///< Map of the states of the actor	
+	State* m_state = nullptr;					///< Current state of the actor
 
 public: 
 	Actor();
@@ -27,34 +26,26 @@ public:
 	Actor(glm::vec2 pos, glm::vec2 size, const sf::Texture &texture);
 	virtual ~Actor();
 
-	/// <summary>
-	/// Return the current velocity of the actor.
-	/// </summary>
-	/// <returns>gml vector 2 with velocity in 2 dimensions</returns>
+	/// @brief Return the current velocity of the actor.
+	/// @return glm vector 2 with velocity in 2 dimensions</returns>
 	glm::vec2 getVelocity() const;
 
-	/// <summary>
-	/// Set the velocity of the actor.
-	/// </summary>
-	/// <param name="velocity">gml vector 2 with velocity in 2 dimensions</param>
+
+	/// @brief Set the velocity of the actor.
+	/// @param velocity glm vector 2 with velocity in 2 dimensions
 	void setVelocity(glm::vec2 velocity);
 	
-	/// <summary>
-	/// Add a vector to the current velocity
-	/// </summary>
-	/// <param name="velocity">gml vector 2 with velocity in 2 dimensions</param>
+	/// @brief Add a vector to the current velocity
+	/// @param velocity glm vector 2 with velocity in 2 dimensions
 	void addToVelocity(glm::vec2 velocity);
 
-	/// <summary>
-	/// Return the gravity applied to the actor.
-	/// </summary>
-	/// <returns>float gravity</returns>
+
+	/// @brief Return the gravity applied to the actor.
+	/// @return float gravity
 	float getGravity();
 
-	/// <summary>
-	/// Update the position of the actor according to its velocity and gravity.
-	/// </summary>
-	/// <param name="dT">delta Time</param>
+	/// @brief Update the position of the actor according to its velocity and gravity.
+	/// @param dT delta Time
 	virtual void update(float dT);
 
 	/// @brief Switch to the desired state.

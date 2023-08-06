@@ -45,7 +45,7 @@ int main()
                 display->stop();
             }
             if (event.type == sf::Event::Resized) {
-				display->getWindow()->setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
+				display->getWindow()->setView(sf::View(sf::FloatRect(0, 0, (float)event.size.width, (float)event.size.height)));
 			}
             if(event.type == sf::Event::KeyPressed){
 				if(event.key.code == sf::Keyboard::LAlt || event.key.code == sf::Keyboard::RAlt){

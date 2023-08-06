@@ -8,26 +8,23 @@ Player::Player(glm::vec2 pos, const sf::Texture& texture) : Pawn(pos, texture)
 {
 	m_speed = glm::vec2(100.0f,200.0f); // Speed, magic number.
 
-    m_states["Idle"] =          new CanFall<CanCrouch<CanMove<CanWalk<CanJump<CanAttack<Idle>>>>>>{this};
-    m_states["Walk"] =          new CanFall<CanMove<CanCrouch<CanJump<CanAttack<Walk>>>>>{this};
-    m_states["Jump"] =          new CanFall<CanMove<CanAttack<Jump>>>{this};
-    m_states["Crouch"] =        new CanFall<CanJump<Crouch>>{this};
-    m_states["Attack"] =        new CanFall<Attack>{this};
-    m_states["CrouchStab"] =    new CanFall<CrouchStab>{this};
+    // Seting up states using decorators
+    m_states["Idle"]        = new CanFall<CanCrouch<CanMove<CanWalk<CanJump<CanAttack<Idle>>>>>>{this};
+    m_states["Walk"]        = new CanFall<CanMove<CanCrouch<CanJump<CanAttack<Walk>>>>>{this};
+    m_states["Jump"]        = new CanFall<CanMove<CanAttack<Jump>>>{this};
+    m_states["Crouch"]      = new CanFall<CanJump<Crouch>>{this};
+    m_states["Attack"]      = new CanFall<Attack>{this};
+    m_states["CrouchStab"]  = new CanFall<CrouchStab>{this};
     
 
     // Default state
     m_state = m_states["Idle"];
-    m_state->in(0.0f);
+    m_state->in();
 
     // Hurtbox
     this->size = { sprite->getTextureRect().width / 1.33, sprite->getTextureRect().height};
     this->sprite->setOrigin(size.x/2.0f, size.y/2.0f);
 }
-
-//Player::Player(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture) : Pawn(pos, size, texture)
-//{
-//}
 
 Player::~Player()
 {
@@ -36,7 +33,7 @@ Player::~Player()
 void Player::update(float dT)
 {
 	if (m_controller != nullptr) {
-        //Cheat code
+        //Cheat actions
         if (m_controller->up()) {
             this->velocity.y += this->m_speed.y * dT;
         }
@@ -44,7 +41,7 @@ void Player::update(float dT)
             this->velocity.y -= this->m_speed.y * dT;
         }*/
 
-
+        // Call upon the state to update
         m_state->update(dT);
 
         // Applying velocity cap
@@ -61,11 +58,8 @@ void Player::update(float dT)
             velocity.y = -speedCap.y;
         }
 
+        // Updating position
         position += velocity;
-
-        // Call the parent update function
-	    //Pawn::update(dT);
-
 	}
 }
 
@@ -102,7 +96,7 @@ Player::Idle::~Idle()
 
 }
 
-void Player::Idle::in(float dT)
+void Player::Idle::in()
 {
     m_player->sprite->setTextureRect(m_spriteRect);
 }
@@ -111,7 +105,7 @@ void Player::Idle::update(float dT)
 {
 }
 
-void Player::Idle::out(float dT)
+void Player::Idle::out()
 {
 
 }
@@ -137,13 +131,13 @@ Player::Walk::~Walk()
 
 }
 
-void Player::Walk::in(float dT)
+void Player::Walk::in()
 {
     m_animationTimer = 0.0f;
 	m_player->sprite->setTextureRect(m_animationSequence[0]);
 }
 
-void Player::Walk::out(float dT)
+void Player::Walk::out()
 {
 
 }
@@ -154,14 +148,12 @@ void Player::Walk::update(float dT)
     if (m_player->velocity.x < -FLT_EPSILON || m_player->velocity.x > FLT_EPSILON) {
 	    m_animationTimer += dT;
 
-		m_player->sprite->setTextureRect(m_animationSequence[((int)(m_animationTimer * 12) % 6)]);
+		m_player->sprite->setTextureRect(m_animationSequence[((size_t)(m_animationTimer * 12) % 6)]);
 	} 
-    // If the player is not moving since 2 seconds, switch to idle
+    // If the player is not moving, switch to idle
     else { 
-        if (dT >= 2.0f) {
-            m_player->switchState("Idle");
-            return;
-        }
+        m_player->switchState("Idle");
+        return;
     }
 }
 
@@ -169,7 +161,7 @@ void Player::Walk::update(float dT)
 /*                          Jump                          */
 /* ********** ********** ********** ********** ********** */
 
-Player::Jump::Jump(Player* player) : PlayerState(player), 
+Player::Jump::Jump(Player* player) : PlayerState(player), m_jumpHeldTimer(0.0f),
     m_spriteRect(96, 0, 32, 32), m_jumpMaxDuration(.1f)
 {
 }
@@ -178,7 +170,7 @@ Player::Jump::~Jump()
 {
 }
 
-void Player::Jump::in(float dT)
+void Player::Jump::in()
 {
     m_player->sprite->setTextureRect(m_spriteRect);
 	//m_player->velocity.y = m_player->m_speed.y / 7500.0f;
@@ -190,7 +182,7 @@ void Player::Jump::in(float dT)
     m_jumpHeld = true;
 }
 
-void Player::Jump::out(float dT)
+void Player::Jump::out()
 {
 	m_player->m_jumping = false;
 }
@@ -228,13 +220,13 @@ Player::Crouch::Crouch(Player* player) : PlayerState(player), m_spriteRect(2 * 3
 Player::Crouch::~Crouch()
 {
 }
-void Player::Crouch::in(float dT)
+void Player::Crouch::in()
 {
 	m_player->sprite->setTextureRect(m_spriteRect);
     // Make player smaller
 }
 
-void Player::Crouch::out(float dT)
+void Player::Crouch::out()
 {
 	// Restore player size
 }
@@ -264,13 +256,13 @@ Player::Attack::Attack(Player* player) : PlayerState(player),
 Player::Attack::~Attack() {
 }
 
-void Player::Attack::in(float dT) {
+void Player::Attack::in() {
     m_player->sprite->setTextureRect(m_animationSequence[0]);
     m_animationTimer = 0.1f;
     // Enable hitbox
 }
 
-void Player::Attack::out(float dT) {
+void Player::Attack::out() {
     // Disable hitbox
 }
 
@@ -281,7 +273,7 @@ void Player::Attack::update(float dT) {
 		m_player->switchState("Idle");
 	}
     else {
-		m_player->sprite->setTextureRect(m_animationSequence[((int)(m_animationTimer * 4) % 2)]);
+		m_player->sprite->setTextureRect(m_animationSequence[((size_t)(m_animationTimer * 4) % 2)]);
 	}
 }
 
@@ -302,13 +294,13 @@ Player::CrouchStab::~CrouchStab() {
     
 }
 
-void Player::CrouchStab::in(float dT) {
+void Player::CrouchStab::in() {
     m_player->sprite->setTextureRect(m_animationSequence[0]);
     m_animationTimer = 0.1f;
     // Enable hitbox
 }
 
-void Player::CrouchStab::out(float dT) {
+void Player::CrouchStab::out() {
     // Disable hitbox
 }
 
@@ -319,7 +311,7 @@ void Player::CrouchStab::update(float dT) {
         m_player->switchState("Crouch");
     }
     else {
-        m_player->sprite->setTextureRect(m_animationSequence[((int)(m_animationTimer * 4) % 2)]);
+        m_player->sprite->setTextureRect(m_animationSequence[((size_t)(m_animationTimer * 4) % 2)]);
     }
 }
 

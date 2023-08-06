@@ -50,9 +50,9 @@ void Actor::update(float dT)
 void Actor::switchState(std::string nextState)
 {
 	if (m_states.contains(nextState)) {
-		m_state->out(0.0f);				// Call end of state function
+		m_state->out();				// Call end of state function
 		m_state = m_states[nextState];	// Switch to desired state
-		m_state->in(0.0f);				// Call new state's start function
+		m_state->in();				// Call new state's start function
 	}
 	else {
 		std::cerr << "[ERROR] " << nextState << " is not a known state." << std::endl;

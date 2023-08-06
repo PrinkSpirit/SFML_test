@@ -6,10 +6,10 @@ class State
 public:
 	/// @brief Function called when the state is entered.
 	/// @param dT Delta time.
-	virtual void in(float) = 0;
+	virtual void in() = 0;
 	/// @brief Function called at state exit.
 	/// @param dT Delta time.
-	virtual void out(float) = 0;
+	virtual void out() = 0;
 
 	/// @brief Function called every tick.
 	/// @param dt Delta time.

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Pawn.h"
 #include "Controller.h"
 #include "State.h"
@@ -7,39 +8,39 @@
 class Player : public Pawn
 {
 protected:
-	bool m_jumping = false; /// Whether the player is jumping.
-	bool m_grounded = false; /// Whether the player is on the ground.
+	bool m_jumping = false;					///< Whether the player is jumping.
+	bool m_grounded = false;				///< Whether the player is on the ground.
 
-	Controller* m_controller = nullptr;			/// Pointer to the control manager
+	Controller* m_controller = nullptr;		///< Pointer to the control manager
 
 	// Player states
-	class PlayerState;	// Abstract base class for other states
-	class Idle;			// Idle state
-	class Walk;			// Walking state
-	class Jump;			// Jumping state
-	class Crouch;		// Crouching state
-	class Attack;		// Attacking state
-	class CrouchStab;	// Crouch attack state
+	class PlayerState;	/// Abstract base class for other states
+	class Idle;			/// Idle state
+	class Walk;			/// Walking state
+	class Jump;			/// Jumping state
+	class Crouch;		/// Crouching state
+	class Attack;		/// Attacking state
+	class CrouchStab;	/// Crouch attack state
 
 	// State decorators
 	template <class T>
-	class CanFall;		// Allow state to handle gravity
+	class CanFall;		/// Allow state to handle gravity
 	template <class T>
-	class CanMove;		// Allow state to handle horizontal movement
+	class CanMove;		/// Allow state to handle horizontal movement
 	template <class T>
-	class CanJump;		// Allow state to switch to jumping state via the jump action
+	class CanJump;		/// Allow state to switch to jumping state via the jump action
 	template <class T>
-	class CanWalk;		// Allow state to switch to walking state via grounded movement
+	class CanWalk;		/// Allow state to switch to walking state via grounded movement
 	template <class T>
-	class CanCrouch;	// Allow state to switch to crouching state via the down action
+	class CanCrouch;	/// Allow state to switch to crouching state via the down action
 	template <class T>
-	class CanAttack;	// Allow state to switch to attacking state via the attack action
+	class CanAttack;	/// Allow state to switch to attacking state via the attack action
 
 
 public:
 	Player();
 	Player(glm::vec2 pos, const sf::Texture& texture);
-	//Player(glm::vec2 pos, glm::vec2 size, const sf::Texture& texture);
+	
 	virtual ~Player();
 	
 	/// @brief Update the player state. Call the actor parent update function.
@@ -64,32 +65,28 @@ public:
 /// @brief State base class for players. Abstract.
 class Player::PlayerState : public State {
 protected:
-	/// @brief Pointer to the player.
-	Player* m_player;
+	Player* m_player; ///< Pointer to the player
 
 public:
 	PlayerState() = delete;
 	PlayerState(Player*);
 	virtual ~PlayerState();
 
-	void in(float dT) override = 0;
-	void out(float dT) override = 0;
+	void in() override = 0;
+	void out() override = 0;
 	void update(float dT) override = 0;
-
-	//virtual void jump(float) = 0;
-	//virtual void croutch(float) = 0;
 };
 
 
 /// @brief Basic state for imobile player.
 class Player::Idle : public PlayerState {
 protected:
-	sf::IntRect m_spriteRect;
+	sf::IntRect m_spriteRect;						///< Position of the sprite in the texture
 
 public:
-	void in(float dT);
-	void out(float dT);
-	void update(float dT);
+	void in();
+	void out();
+	void update(float);
 
 	Idle(Player*);
 	~Idle();
@@ -98,13 +95,13 @@ public:
 /// @brief Walking on the ground.
 class Player::Walk : public PlayerState {
 protected:
-	std::vector<sf::IntRect> m_animationSequence;
-	float m_animationTimer = 0.0f;
+	std::vector<sf::IntRect> m_animationSequence;	///< Sequence of sprites for the animation
+	float m_animationTimer = 0.0f;					///< Timer for the animation
 
 public:
-	void in(float dT);
-	void out(float dT);
-	void update(float dT);
+	void in();
+	void out();
+	void update(float);
 
 	Walk(Player*);
 	~Walk();
@@ -113,16 +110,16 @@ public:
 /// @brief Jumping state.
 class Player::Jump : public PlayerState {
 protected:
-	sf::IntRect m_spriteRect;
+	sf::IntRect m_spriteRect;						///< Position of the sprite in the texture
 
-	bool m_jumpHeld = false;
-	float m_jumpHeldTimer;
-	float m_jumpMaxDuration;
+	bool m_jumpHeld = false;						///< Stays true until the jump button is released
+	float m_jumpHeldTimer;							///< How long the jump button has been held
+	float m_jumpMaxDuration;						///< How long the jump can last
 
 public:
-	void in(float dT);
-	void out(float dT);
-	void update(float dT);
+	void in();
+	void out();
+	void update(float);
 
 	Jump(Player*);
 	~Jump();
@@ -134,9 +131,9 @@ protected:
 	sf::IntRect m_spriteRect;
 
 public:
-	void in(float dT);
-	void out(float dT);
-	void update(float dT);
+	void in();
+	void out();
+	void update(float);
 
 	Crouch(Player*);
 	~Crouch();
@@ -149,23 +146,25 @@ protected:
 	float m_animationTimer = 0.0f;
 
 public:
-	void in(float dT);
-	void out(float dT);
-	void update(float dT);
+	void in();
+	void out();
+	void update(float);
 
 	Attack(Player*);
 	~Attack();
 };
 
+/// @brief Attacking while crouched state. Name is reference to the Ocarina of Time
+/// community name for the same move in case you are wondering.
 class Player::CrouchStab : public PlayerState {
 protected:
 	std::vector<sf::IntRect> m_animationSequence;
 	float m_animationTimer = 0.0f;
 
 public:
-	void in(float dT);
-	void out(float dT);
-	void update(float dT);
+	void in();
+	void out();
+	void update(float);
 
 	CrouchStab(Player*);
 	~CrouchStab();
@@ -175,7 +174,7 @@ public:
 /*                     STATES DECORATOR                   */
 /* ********** ********** ********** ********** ********** */
 
-/// @brief'Handle horizontal movement for the current state. Décorator.
+/// @brief Handle horizontal movement for the current state. Decorator.
 /// @tparam T Child of PlayerState
 template <class T>
 class Player::CanMove : public T {
@@ -183,12 +182,12 @@ class Player::CanMove : public T {
 	sf::Vector2f m_scale;
 
 public:
-	void in(float dT) {
-		T::in(dT);
+	void in() {
+		T::in();
 	}
 
-	void out(float dT) {
-		T::out(dT);
+	void out() {
+		T::out();
 	}
 
 	void update(float dT) {
@@ -228,12 +227,12 @@ class Player::CanFall : public T {
 	static_assert(std::is_base_of<Player::PlayerState, T>::value, "T must derive from PlayerState");
 
 public:
-	void in(float dT) {
-		T::in(dT);
+	void in() {
+		T::in();
 	}
 
-	void out(float dT) {
-		T::out(dT);
+	void out() {
+		T::out();
 	}
 
 	void update(float dT) {
@@ -260,17 +259,16 @@ class Player::CanJump : public T {
 	static_assert(std::is_base_of<Player::PlayerState, T>::value, "T must derive from PlayerState");
 
 public:
-	void in(float dT) {
-		T::in(dT);
+	void in() {
+		T::in();
 	}
 
-	void out(float dT) {
-		T::out(dT);
+	void out() {
+		T::out();
 	}
 
 	void update(float dT) {
-		//T::m_player->m_grounded && 
-		if (T::m_player->getController()->jump()) {
+		if (T::m_player->m_grounded && T::m_player->getController()->jump()) {
 			T::m_player->switchState("Jump");
 			return; // Return on state change
 		}
@@ -294,17 +292,16 @@ class Player::CanWalk : public T {
 	static_assert(std::is_base_of<Player::PlayerState, T>::value, "T must derive from PlayerState");
 
 public:
-	void in(float dT) {
-		T::in(dT);
+	void in() {
+		T::in();
 	}
 
-	void out(float dT) {
-		T::out(dT);
+	void out() {
+		T::out();
 	}
 
 	void update(float dT) {
-		//T::m_player->m_grounded && 
-		if ((T::m_player->velocity.x < -FLT_EPSILON || T::m_player->velocity.x > FLT_EPSILON)) {
+		if (T::m_player->m_grounded && (T::m_player->velocity.x < -FLT_EPSILON || T::m_player->velocity.x > FLT_EPSILON)) {
 			T::m_player->switchState("Walk");
 			return; // Return on state change
 		}
@@ -323,12 +320,12 @@ class Player::CanCrouch : public T {
 	static_assert(std::is_base_of<Player::PlayerState, T>::value, "T must derive from PlayerState");
 
 public:
-	void in(float dT) {
-		T::in(dT);
+	void in() {
+		T::in();
 	}
 
-	void out(float dT) {
-		T::out(dT);
+	void out() {
+		T::out();
 	}
 
 	void update(float dT) {
@@ -350,12 +347,12 @@ class Player::CanAttack : public T {
 	static_assert(std::is_base_of<Player::PlayerState, T>::value, "T must derive from PlayerState");
 
 public:
-	void in(float dT) {
-		T::in(dT);
+	void in() {
+		T::in();
 	}
 
-	void out(float dT) {
-		T::out(dT);
+	void out() {
+		T::out();
 	}
 
 	void update(float dT) {
