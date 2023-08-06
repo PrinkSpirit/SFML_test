@@ -8,9 +8,11 @@ Player::Player(glm::vec2 pos, const sf::Texture& texture) : Pawn(pos, texture)
 {
 	m_speed = glm::vec2(100.0f,200.0f); // Speed, magic number.
 
-    m_states["Idle"] = new CanFall<CanMove<CanWalk<CanJump<Idle>>>>{this};
-    m_states["Walk"] = new CanFall<CanMove<CanJump<Walk>>>{this};
+    m_states["Idle"] = new CanFall<CanCrouch<CanMove<CanWalk<CanJump<Idle>>>>>{this};
+    m_states["Walk"] = new CanFall<CanMove<CanCrouch<CanJump<Walk>>>>{this};
     m_states["Jump"] = new CanFall<CanMove<Jump>>{this};
+    m_states["Crouch"] = new CanFall<CanJump<Crouch>>{this};
+    
 
     // Default state
     m_state = m_states["Idle"];
@@ -36,9 +38,9 @@ void Player::update(float dT)
         if (m_controller->up()) {
             this->velocity.y += this->m_speed.y * dT;
         }
-        if (m_controller->down()) {
+        /*if (m_controller->down()) {
             this->velocity.y -= this->m_speed.y * dT;
-        }
+        }*/
 
 
         m_state->update(dT);
@@ -93,12 +95,10 @@ Player::Idle::Idle(Player* player) : PlayerState(player), m_spriteRect(0, 0, 32,
     
 }
 
-
 Player::Idle::~Idle()
 {
 
 }
-
 
 void Player::Idle::in(float dT)
 {
@@ -151,15 +151,12 @@ void Player::Walk::update(float dT)
 {
     // If the player is moving, play the walk animation
     if (m_player->velocity.x < -FLT_EPSILON || m_player->velocity.x > FLT_EPSILON) {
-        m_idleTimer = 0.0f;
 	    m_animationTimer += dT;
 
 		m_player->sprite->setTextureRect(m_animationSequence[((int)(m_animationTimer * 12) % 6)]);
 	} 
     // If the player is not moving since 2 seconds, switch to idle
-    else if(m_idleTimer >= 2.0f) { 
-        m_idleTimer += dT;
-
+    else { 
         if (dT >= 2.0f) {
             m_player->switchState("Idle");
             return;
@@ -218,3 +215,32 @@ void Player::Jump::update(float dT)
 }
 
 
+/* ********** ********** ********** ********** ********** */
+/*                         Crouch                         */
+/* ********** ********** ********** ********** ********** */
+
+Player::Crouch::Crouch(Player* player) : PlayerState(player), m_spriteRect(2 * 32, 32, 32, 32)
+{
+
+}
+
+Player::Crouch::~Crouch()
+{
+}
+void Player::Crouch::in(float dT)
+{
+	m_player->sprite->setTextureRect(m_spriteRect);
+    // Make player smaller
+}
+
+void Player::Crouch::out(float dT)
+{
+	// Restore player size
+}
+
+void Player::Crouch::update(float dT)
+{
+    if (!m_player->getController()->down()) {
+		m_player->switchState("Idle");
+	}
+}

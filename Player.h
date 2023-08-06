@@ -26,6 +26,8 @@ protected:
 	class CanJump;
 	template <class T>
 	class CanWalk;
+	template <class T>
+	class CanCrouch;
 
 
 public:
@@ -119,7 +121,19 @@ public:
 	~Jump();
 };
 
-class Player::Crouch;
+class Player::Crouch : public PlayerState {
+protected:
+	sf::IntRect m_spriteRect;
+
+public:
+	void in(float dT);
+	void out(float dT);
+	void update(float dT);
+
+	Crouch(Player*);
+	~Crouch();
+};
+
 class Player::Attack;
 
 
@@ -268,4 +282,30 @@ public:
 };
 
 // can crouch
+template <class T>
+class Player::CanCrouch : public T {
+	static_assert(std::is_base_of<Player::PlayerState, T>::value, "T must derive from PlayerState");
+
+public:
+	void in(float dT) {
+		T::in(dT);
+	}
+
+	void out(float dT) {
+		T::out(dT);
+	}
+
+	void update(float dT) {
+		if (T::m_player->getController()->down()) {
+			T::m_player->switchState("Crouch");
+			return; // Return on state change
+		}
+		T::update(dT);
+	}
+
+
+	template <typename... Args>
+	CanCrouch(Args... args) : T(std::forward<Args>(args)...) {}
+};
+
 // can attack
