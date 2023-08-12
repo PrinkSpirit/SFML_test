@@ -100,6 +100,8 @@ void Level::update(float dT)
 		}
 
 		boundingBoxCollision(actor, dT);
+
+		// TODO: Do this elsewhere and don't reduce velocity to 0
 		actor->setVelocity(glm::vec2(0.0f, actor->getVelocity().y));
 	}
 }
