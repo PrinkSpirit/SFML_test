@@ -35,10 +35,8 @@ public:
 	Level();
 	~Level();
 
-	/// <summary>
-	/// Add a static element to the level.
-	/// </summary>
-	/// <param name="object">Pointer to a static object</param>
+	/// @brief Add a static element to the level.
+	/// @param object Pointer to a static object.
 	void addStaticObject(StaticObject* object);
 
 	/// <summary>
@@ -47,47 +45,35 @@ public:
 	/// <param name="actor">Pointer to an actor</param>
 	void addActor(Actor* actor);
 
-	/// <summary>
-	/// Set the pointer to the player object.
-	/// </summary>
-	/// <param name="player">Pointer to the player</param>
+	/// @brief Set the pointer to the player object.
+	/// @param player Pointer to the player.
 	void setPlayer(Player* player);
 
-	/// <summary>
-	/// Returns the player object.
-	/// </summary>
-	/// <returns>Pointer to the player</returns>
+	/// @brief Returns the player object.
+	/// @return Pointer to the player.
 	Player* getPlayer();
 
-	/// <summary>
-	/// Placeholder. Creates a test level.
-	/// </summary>
+	/// @brief Placeholder. Creates a test level.
 	void testLevel();
 
-	/// <summary>
-	/// Updates all actors in the level.
-	/// </summary>
-	/// <param name="dT">Delta Time - Time elapsed since last function call</param>
+	/// @brief Updates all actors in the level.
+	/// @param dT Delta Time - Time elapsed since last function call
 	void update(float dT);
 
 	
 
-	/// <summary>
-	/// Check collisions with the level's boundaries
-	/// </summary>
-	/// <param name="actor">Actor checked</param>
-	/// <param name="dT">Delta time</param>
+	/// @brief Check collisions with the level's boundaries
+	/// @param actor Actor checked.
+	/// @param dT Delta time.
 	void boundingBoxCollision(Actor* actor, float dT);
 };
 
-/// <summary>
-/// Check if two rectangles overlap.
-/// </summary>
-/// <param name="A1"></param>
-/// <param name="A2"></param>
-/// <param name="B1"></param>
-/// <param name="B2"></param>
-/// <returns>Boolean</returns>
+/// @brief Check if two rectangles overlap.
+/// @param A1 Bottom left corner of the first rectangle.
+/// @param A2 Top right corner of the first rectangle.
+/// @param B1 Bottom left corner of the second rectangle.
+/// @param B2 Top right corner of the second rectangle.
+/// @returns Boolean.
 bool intersects(glm::vec2 A1, glm::vec2 A2, glm::vec2 B1, glm::vec2 B2);
 
 void handleCollision(Actor* actor, GameObject* object, float dT);
