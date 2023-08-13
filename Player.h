@@ -11,7 +11,7 @@ protected:
 	bool m_jumping = false;					///< Whether the player is jumping.
 	bool m_grounded = false;				///< Whether the player is on the ground.
 
-	Controller* m_controller = nullptr;		///< Pointer to the control manager
+	Controller* m_controller;		///< Pointer to the control manager
 
 	// Player states
 	class PlayerState;	/// Abstract base class for other states
@@ -54,7 +54,7 @@ public:
 
 	/// @brief Return the pointer to the control manager.
 	/// @returns Pointer to controller
-	Controller* getController() const;
+	Controller &getController() const;
 };
 
 
@@ -191,9 +191,9 @@ public:
 	}
 
 	void update(float dT) {
-		if (T::m_player->getController()->left())
+		if (T::m_player->getController()["Left"].held())
 			T::m_player->velocity.x -= T::m_player->m_speed.x * dT;
-		if (T::m_player->getController()->right())
+		if (T::m_player->getController()["Right"].held())
 			T::m_player->velocity.x += T::m_player->m_speed.x * dT;
 
 		if (T::m_player->velocity.x > T::m_player->speedCap.x) {
@@ -268,7 +268,7 @@ public:
 	}
 
 	void update(float dT) {
-		if (T::m_player->m_grounded && T::m_player->getController()->jump()) {
+		if (T::m_player->m_grounded && T::m_player->getController()["Jump"].down()) {
 			T::m_player->switchState("Jump");
 			return; // Return on state change
 		}
@@ -329,7 +329,7 @@ public:
 	}
 
 	void update(float dT) {
-		if (T::m_player->getController()->down()) {
+		if (T::m_player->getController()["Down"].down()) {
 			T::m_player->switchState("Crouch");
 			return; // Return on state change
 		}
@@ -356,7 +356,7 @@ public:
 	}
 
 	void update(float dT) {
-		if (T::m_player->getController()->attack()) {
+		if (T::m_player->getController()["Attack"].down()) {
 			T::m_player->switchState("Attack");
 			return; // Return on state change
 		}

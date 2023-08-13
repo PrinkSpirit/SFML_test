@@ -32,9 +32,9 @@ Player::~Player()
 
 void Player::update(float dT)
 {
-	if (m_controller != nullptr) {
+    if (m_controller != nullptr) {
         //Cheat actions
-        if (m_controller->up()) {
+        if ((*m_controller)["Up"].held()) {
             this->velocity.y += this->m_speed.y * dT;
         }
         /*if (m_controller->down()) {
@@ -60,7 +60,8 @@ void Player::update(float dT)
 
         // Updating position
         position += velocity;
-	}
+    }
+		
 }
 
 void Player::setController(Controller* controller)
@@ -68,9 +69,9 @@ void Player::setController(Controller* controller)
     this->m_controller = controller;
 }
 
-Controller* Player::getController() const
+Controller &Player::getController() const
 {
-    return this->m_controller;
+    return *this->m_controller;
 }
 
 Player::PlayerState::PlayerState(Player* player) : m_player(player)
@@ -191,12 +192,12 @@ void Player::Jump::update(float dT)
 {
     // If the player is jumping for more than 4 seconds, or is no longer 
     // holding the jump button, he will stop rising
-    if (m_jumpHeldTimer > m_jumpMaxDuration || !m_player->getController()->jump()) {
+    if (m_jumpHeldTimer > m_jumpMaxDuration || !m_player->getController()["Jump"].up()) {
         m_jumpHeld = false;
         m_player->m_jumping = false;
     }
 	// Else if the jump button is held, the player will jump higher
-    else if (m_jumpHeldTimer <= m_jumpMaxDuration && m_player->getController()->jump() && m_jumpHeld) {
+    else if (m_jumpHeldTimer <= m_jumpMaxDuration && m_player->getController()["Jump"].held() && m_jumpHeld) {
         m_jumpHeldTimer += dT;
 		m_player->velocity.y = m_player->m_speed.y * dT;
 	}
@@ -233,11 +234,13 @@ void Player::Crouch::out()
 
 void Player::Crouch::update(float dT)
 {
-    if (!m_player->getController()->down()) {
+    if (m_player->getController()["Down"].up()) {
 		m_player->switchState("Idle");
+        return;
 	} 
-    if (m_player->getController()->down() && m_player->getController()->attack()) {
+    if (m_player->getController()["Down"].held() && m_player->getController()["Attack"].down()) {
 		m_player->switchState("CrouchStab");
+	    return;
 	}
 }
 
