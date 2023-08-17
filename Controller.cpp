@@ -31,14 +31,16 @@ bool InputEvent::up()
 
 void InputEvent::update()
 {
+	bool down = false;
+
 	for(auto key : m_input_keys)
 	{
-		m_down = sf::Keyboard::isKeyPressed(key) && !m_held;	// Switch from 0 to 1
-		m_held = sf::Keyboard::isKeyPressed(key);				// Stay at 1
-		m_up   = !sf::Keyboard::isKeyPressed(key) && m_held;	// Switch from 1 to 0
-		
-		break;
+		down |= sf::Keyboard::isKeyPressed(key);
 	}
+
+	m_down = down && !m_held;	// Was 0, is now 1
+	m_up = !down && m_held;		// Was 1, is now 0
+	m_held = down;				// Is at 1
 }
 
 Controller::Controller() {
@@ -66,9 +68,9 @@ void Controller::listen(sf::Event event)
 {
 	// We only update if we detect a key event
 	if (event.type == sf::Event::KeyPressed || event.type == sf::Event::JoystickButtonPressed || event.type == sf::Event::KeyReleased || event.type == sf::Event::JoystickButtonReleased) {
-		for(auto event : m_actionMap)
+		for (auto& const action : m_actionMap)
 		{
-			event.second.update();
+			action.second.update();
 		}
 	}
 }

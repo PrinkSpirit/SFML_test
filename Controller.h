@@ -12,6 +12,7 @@ protected:
 	bool m_held = false;	// true when key is held down
 	bool m_up	= false;	// true when key goes from down to up
 
+	/// @brief The set contains the keys coresponding to this action
 	std::set<sf::Keyboard::Key> m_input_keys;
 
 public:
@@ -23,6 +24,7 @@ public:
 	bool held();
 	bool up();
 
+	/// @brief Check if any of the keys from m_input_keys are pressed
 	void update();
 };
 
@@ -31,17 +33,20 @@ public:
 class Controller
 {
 protected:
+	/// @brief Contains a list of actions and the InputEvent to handle the key presses
 	std::unordered_map<std::string, InputEvent> m_actionMap;
-
-	/// @brief The set contains the keys coresponding to each actions
-	
 
 public:
 	Controller();
 	~Controller();
 
+	/// @brief Return the InputEvent for the action
+	/// @param action Name of the action
+	/// @return Reference to the input event
 	InputEvent& operator[](std::string);
 
-	void listen(sf::Event);
+	/// @brief Update the InputEvent for each action
+	/// @param event Event list from SFML
+	void listen(sf::Event); 
 };
 
