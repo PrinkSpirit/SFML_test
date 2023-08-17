@@ -9,9 +9,9 @@ class Player : public Pawn
 {
 protected:
 	bool m_jumping = false;					///< Whether the player is jumping.
-	bool m_grounded = false;				///< Whether the player is on the ground.
+	bool m_grounded = true;				///< Whether the player is on the ground.
 
-	Controller* m_controller;		///< Pointer to the control manager
+	Controller* m_controller = nullptr;		///< Pointer to the control manager
 
 	// Player states
 	class PlayerState;	/// Abstract base class for other states

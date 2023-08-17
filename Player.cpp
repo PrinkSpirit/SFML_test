@@ -186,13 +186,14 @@ void Player::Jump::in()
 void Player::Jump::out()
 {
 	m_player->m_jumping = false;
+	m_player->m_grounded = true;
 }
 
 void Player::Jump::update(float dT)
 {
     // If the player is jumping for more than 4 seconds, or is no longer 
     // holding the jump button, he will stop rising
-    if (m_jumpHeldTimer > m_jumpMaxDuration || !m_player->getController()["Jump"].up()) {
+    if (m_jumpHeldTimer > m_jumpMaxDuration || m_player->getController()["Jump"].up()) {
         m_jumpHeld = false;
         m_player->m_jumping = false;
     }
